@@ -124,21 +124,21 @@ Each config module is pure data (no side effects), matching the example shapes i
 **Description:** Run, jump, double-jump (gated by skill tree unlock), ledge grab/climb, wall-run on tagged surfaces.
 **DoD / Expected Output:** All movement states work across PC/mobile/console input (via T-130) at the target FPS per platform (§17.4). Double-jump is disabled until the corresponding Skill Point node (T-091) is purchased.
 **Test Case:** Manual/integration: spawn character, verify jump count is capped at 1 pre-unlock and 2 post-unlock; wall-run only engages on parts tagged `WallRunnable`.
-- [ ] Done
+- [x] Done
 
 #### T-031 — Dodge roll i-frame system
 **Depends on:** T-010, T-030
 **Description:** Server-validated invincibility window during dodge roll per `CombatConfig.Attacks.DodgeIFrames`/`DodgeCooldown`.
 **DoD / Expected Output:** Damage instances landing within the i-frame window are rejected server-side; cooldown prevents spam-dodging as a de facto invulnerability loop.
 **Test Case:** Integration test: simulate an attack timestamp inside vs. outside the i-frame window; assert damage is blocked only in the former.
-- [ ] Done
+- [x] Done
 
 #### T-032 — Traversal interactable framework
 **Depends on:** T-000, S-002
 **Description:** Generic tag-driven component system for `Lever`, `PressurePlate`, `CollapsingWalkway` (§3.1) — one ModuleScript framework, not per-instance bespoke scripts, so level designers in Studio can drop and configure instances via attributes.
 **DoD / Expected Output:** Any Studio-placed instance with one of these tags and the documented attributes (see S-002) activates correctly with no additional script authoring per chapter.
 **Test Case:** Integration test: tag a test part `PressurePlate`, verify the bound event fires exactly once per press and respects a configurable reset delay.
-- [ ] Done
+- [x] Done
 
 ---
 

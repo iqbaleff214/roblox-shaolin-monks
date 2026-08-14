@@ -38,7 +38,9 @@ Derived from `GDD.md` (v0.1, 2026-08-14). This file covers everything that must 
 | `DestructibleContainer` | Wooden Crate / Clay Urn / Supply Barrel / Jade Chest models | `ContainerType` (string: `WoodenCrate`\|`ClayUrn`\|`SupplyBarrel`\|`JadeChest`) | T-100 |
 | `HazardZone` | Spikes, fire pits, chasms, temple bells, etc. | `HazardType` (string) | T-044 |
 | `NPCVendor` | Sifu's Dojo, Cosmetic Shop stall, Battle Pass board | `VendorType` (string: `ComboScroll`\|`Cosmetic`\|`BattlePass`) | T-126 |
-| `Lever` / `PressurePlate` / `CollapsingWalkway` | Traversal interactables | type-specific (reset delay, target) | T-032 |
+| `Lever` | Interactable lever/switch | `ResetDelay` (number, optional, default 1s), `TargetId` (string, optional) — interaction style auto-detects a descendant `ProximityPrompt` or `ClickDetector`, falling back to walk-into (`Touched`) if neither is present | T-032 |
+| `PressurePlate` | Floor plate triggered by walking onto it | `ResetDelay` (number, optional, default 1s), `TargetId` (string, optional) | T-032 |
+| `CollapsingWalkway` | Floor part that gives way after being stepped on | `CollapseDelay` (number, optional, default 0.4s — trigger to giving way), `ResetDelay` (number, optional, default 5s — giving way to respawn), `TargetId` (string, optional) | T-032 |
 | `WallRunnable` | Surfaces allowing wall-run | — | T-030 |
 | `LootRoom` | Hidden side-room trigger volume | `ArenaId` | S-020–S-027, T-102 |
 | `BossArena` | Boss/mini-boss fight zone | `ChapterId`, `BossId` | T-065 |
