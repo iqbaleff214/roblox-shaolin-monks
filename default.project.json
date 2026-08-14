@@ -1,5 +1,5 @@
 {
-  "name": "anjay-hunter",
+  "name": "shaolin-monks-adventure",
   "tree": {
     "$className": "DataModel",
     "ServerScriptService": {
@@ -9,6 +9,12 @@
       },
       "ServerPackages": {
         "$path": "ServerPackages"
+      }
+    },
+    "ServerStorage": {
+      "$className": "ServerStorage",
+      "Tests": {
+        "$path": "tests"
       }
     },
     "StarterPlayer": {

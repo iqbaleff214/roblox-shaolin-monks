@@ -21,14 +21,14 @@ Derived from `GDD.md` (v0.1, 2026-08-14). This file covers everything buildable 
 **Description:** Set up `rojo.json` / `default.project.json` mapping `src/shared` → `ReplicatedStorage.Shared`, `src/server` → `ServerScriptService`, `src/client` → `StarterPlayer.StarterPlayerScripts`, matching the `src/shared/config/*` layout already specified in GDD §14.1.
 **DoD / Expected Output:** `rojo serve` connects to Studio (via S-000) without errors; folder tree exists for `config/`, `services/` (server), `controllers/` (client), `modules/` (shared utility).
 **Test Case:** `rojo build` produces a valid `.rbxlx`/place file with no path collisions; manual sync round-trip in Studio preserves folder structure.
-- [ ] Done
+- [x] Done
 
 #### T-001 — Set up automated test harness
 **Depends on:** T-000
 **Description:** Add TestEZ (or equivalent) under `src/shared/tests` (or a dedicated `tests/` Rojo mount) and a runner script invokable from the Studio command bar and from CI (headless Studio run if available).
 **DoD / Expected Output:** Running the harness against an empty test suite reports "0 passed / 0 failed" with no errors.
 **Test Case:** A placeholder `SanityTest.spec.lua` asserting `1 + 1 == 2` passes.
-- [ ] Done
+- [x] Done
 
 ---
 
