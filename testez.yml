@@ -1,0 +1,42 @@
+# TestEZ globals injected by the test runner at runtime.
+# Referenced in selene.toml via std = "roblox+testez".
+#
+# NOTE: this replaces a prior testez.toml. selene 0.31.0's TOML std parser
+# silently drops every global defined in TOML format (base/name/property
+# fields don't deserialize the way the classic testez.toml examples assume),
+# so it linted as if TestEZ's globals didn't exist. YAML is the format
+# `selene generate-roblox-std` itself produces (see roblox.yml) and is
+# confirmed working — verified with `selene` against real spec files before
+# this file replaced the old one.
+
+base: luau
+name: testez
+globals:
+  describe:
+    args:
+      - type: string
+      - type: function
+  it:
+    args:
+      - type: string
+      - type: function
+  expect:
+    args:
+      - type: any
+    must_use: true
+  beforeEach:
+    args:
+      - type: function
+  afterEach:
+    args:
+      - type: function
+  beforeAll:
+    args:
+      - type: function
+  afterAll:
+    args:
+      - type: function
+  FOCUS:
+    property: read-only
+  SKIP:
+    property: read-only

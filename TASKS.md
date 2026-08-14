@@ -40,80 +40,80 @@ Each config module is pure data (no side effects), matching the example shapes i
 **Depends on:** T-000
 **DoD / Expected Output:** Returns `Attacks`, `Poise`, `ChiMeter` tables with the fields shown in GDD §14.2 (damage values, `ComboWindow`, `ParryWindow`, `DodgeIFrames`, `DodgeCooldown`, `StaggerThreshold`, `PoiseDecayPerSec`, Chi gain rates).
 **Test Case:** TestEZ spec asserts every numeric field is present and `> 0` (or `>= 0` where zero is valid), and table shape matches expected keys exactly (fails on typos/renames).
-- [ ] Done
+- [x] Done
 
 #### T-011 — WeaponConfig.lua
 **Depends on:** T-000
 **DoD / Expected Output:** One entry per weapon type (Twin Blades, War Staff, Hook Swords, Iron Gauntlets, Battle Glaive per GDD §5.2) with combo string definitions (input sequence → animation ID placeholder → damage multiplier) and an `Ultimate` sub-table (damage, AoE radius/shape, animation ID placeholder, cosmetic FX slot reference).
 **DoD note:** Base damage-per-second across all 5 weapons must be within a tunable tolerance band (e.g. ±5%) of each other at default combo efficiency — encodes the "balanced by design" pillar (§5.2) as a checkable constant, not just prose.
 **Test Case:** TestEZ spec computes theoretical DPS per weapon from the config and asserts all 5 fall within the tolerance band; fails loudly if a future edit breaks balance.
-- [ ] Done
+- [x] Done
 
 #### T-012 — EnemyConfig.lua
 **Depends on:** T-000
 **DoD / Expected Output:** Matches GDD §14.3 shape — `ConcurrentAttackerCap`, `AggroRadius`, `AttackTelegraph`, and a `Roles` table for Grunt/Soldier/Heavy/Ranged/Assassin/Elite (+ a `Boss` role added here even though GDD's example omits it, since §4.2 requires one).
 **Test Case:** TestEZ spec asserts `ConcurrentAttackerCap` is between 2–3 (per §4.3 design rule) and every role has `Health`, `Damage`, `Poise` at minimum.
-- [ ] Done
+- [x] Done
 
 #### T-013 — ChapterConfig.lua
 **Depends on:** T-000
 **DoD / Expected Output:** One entry per chapter (8, per GDD §8.1) with: id, display name, difficulty tier (§8.3), level-unlock gate, enemy faction reference (§4.6), signature hazard tag, arena count, boss/mini-boss reference.
 **Test Case:** TestEZ spec asserts exactly 8 chapters exist, tiers are one of Novice/Adept/Veteran/Master, and level gates are non-decreasing in chapter order (later chapters never unlock at a lower level than earlier ones).
-- [ ] Done
+- [x] Done
 
 #### T-014 — LootConfig.lua
 **Depends on:** T-000
 **DoD / Expected Output:** Matches GDD §14.4 — `Containers` (WoodenCrate/ClayUrn/SupplyBarrel/JadeChest with `Hits` + `DropTable`) and `ChestRarityWeights` for Arena/Chapter/Boss/Vault tiers (§10.4).
 **Test Case:** TestEZ spec asserts each `ChestRarityWeights` row sums to 100 (fails if a rarity edit breaks the published odds — this table is player-facing per §10.4's transparency rule).
-- [ ] Done
+- [x] Done
 
 #### T-015 — AccessoryConfig.lua
 **Depends on:** T-000
 **DoD / Expected Output:** Item definitions for Head/Body/Arm/Leg slots (§5.1) with rarity tier (§5.3), unlock source (Shop/BattlePass/Crate/QuestReward), and explicitly **no** combat-stat fields (enforce cosmetic-only by omission).
 **Test Case:** TestEZ spec asserts no entry contains a disallowed key (`Damage`, `Health`, `Speed`, etc.) — a lint-style guard against accidental pay-to-win creep.
-- [ ] Done
+- [x] Done
 
 #### T-016 — ProgressionConfig.lua
 **Depends on:** T-000
 **DoD / Expected Output:** XP formula constants (§9.1 multiplier table), level thresholds, Skill Point costs per node (§9.2), and the capped stat-growth ceiling (must reach its cap by Level 30 per the design rule in §9.2).
 **Test Case:** TestEZ spec asserts the stat-growth curve is monotonically non-decreasing and flat (capped) at/after Level 30.
-- [ ] Done
+- [x] Done
 
 #### T-017 — ShopConfig.lua
 **Depends on:** T-000
 **DoD / Expected Output:** Item definitions, prices (Coins/Jade per §11.2 table), bundle contents, and Jade product references — matches GDD §12.1's "no magic numbers" rule; Combo Scrolls priced here must be Coin-only (cross-check against T-111).
 **Test Case:** TestEZ spec asserts every Combo Scroll entry has `Currency = "Coins"` (never `"Jade"`) — encodes the §10.3 rule that technique unlocks are never premium-currency purchasable.
-- [ ] Done
+- [x] Done
 
 #### T-018 — MonetizationConfig.lua
 **Depends on:** T-000
 **DoD / Expected Output:** Matches GDD §14.5 — `GamePasses` (VIPPassId, BattlePassId), `JadeProducts` (3 tiers), `CoinToJadeRate = nil` (enforced one-way economy), `VIPBoostXP`/`VIPBoostCoins`.
 **Test Case:** TestEZ spec asserts `CoinToJadeRate` is `nil`/absent (regression guard against someone "helpfully" adding a conversion rate later). IDs are allowed to be `0` here (filled later per S-084/T-200) but the test flags them as a warning, not a failure, at this stage.
-- [ ] Done
+- [x] Done
 
 #### T-019 — AudioConfig.lua
 **Depends on:** T-000
 **DoD / Expected Output:** Matches GDD §14.5/§16 — every SFX and Music entry from the §16 table present with `Id`, `Volume`, and `PitchRange` where applicable.
 **Test Case:** TestEZ spec asserts every event listed in GDD §16's table has a corresponding config key (catches drift if the GDD's audio list changes without the config being updated).
-- [ ] Done
+- [x] Done
 
 #### T-020 — UIConfig.lua
 **Depends on:** T-000
 **DoD / Expected Output:** Colors, font sizes, layout anchors, and the responsive breakpoint table (desktop/tablet/portrait per §15.2) plus particle-limit tiers per quality setting (§17.4).
 **Test Case:** TestEZ spec asserts breakpoints are strictly ordered (desktop width > tablet width > portrait width).
-- [ ] Done
+- [x] Done
 
 #### T-021 — LocalizationConfig.lua
 **Depends on:** T-000
 **DoD / Expected Output:** Supported locale list matching §13.1 (8 launch languages) with a fallback chain (unsupported locale → `en`).
 **Test Case:** TestEZ spec asserts `en` is always present and is the fallback root (no fallback cycles).
-- [ ] Done
+- [x] Done
 
 #### T-022 — ConfigService.lua aggregator
 **Depends on:** T-010–T-021
 **DoD / Expected Output:** Matches GDD §14.6 — single `require` point exposing all config modules; no gameplay/UI script requires an individual config file directly.
 **Test Case:** TestEZ spec requires `ConfigService` and asserts all 12 sub-keys are non-nil tables. A lint task (T-151) later scans the codebase for direct `config.XConfig` requires bypassing this service.
-- [ ] Done
+- [x] Done
 
 ---
 
