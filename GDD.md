@@ -1,10 +1,11 @@
-# Golfify — Game Design Document
+# Shaolin Monks Adventure — Game Design Document
 
-**Version:** 0.1  
-**Platform:** Roblox  
-**Genre:** Casual / Sports / Multiplayer  
-**Target Audience:** All ages (8+), casual and competitive players  
-**Max Players per Server:** 8  
+**Version:** 0.1
+**Platform:** Roblox
+**Genre:** Action-Adventure / Hack-and-Slash / Co-op Multiplayer
+**Target Audience:** 10+, fans of combo-driven brawlers and adventure games
+**Max Players per Lobby Server:** 20
+**Max Players per Battlefield Instance:** 4 (co-op party)
 
 ---
 
@@ -12,470 +13,564 @@
 
 1. [Vision & Concept](#1-vision--concept)
 2. [Core Loop](#2-core-loop)
-3. [Gameplay Mechanics](#3-gameplay-mechanics)
-4. [Controls (Cross-Platform)](#4-controls-cross-platform)
-5. [Game Modes](#5-game-modes)
-6. [Course Design](#6-course-design)
-7. [Chaos Modifiers](#7-chaos-modifiers)
-8. [Progression & Retention](#8-progression--retention)
-9. [Monetization](#9-monetization)
-10. [Social & Multiplayer](#10-social--multiplayer)
-11. [Localization](#11-localization)
-12. [Asset Configuration](#12-asset-configuration)
-13. [UI/UX](#13-uiux)
-14. [Audio](#14-audio)
-15. [Technical Notes](#15-technical-notes)
-16. [Nuance & Feel](#16-nuance--feel)
-17. [Out of Scope (v1)](#17-out-of-scope-v1)
+3. [Combat Mechanics](#3-combat-mechanics)
+4. [Enemy System](#4-enemy-system)
+5. [Character Customization](#5-character-customization)
+6. [Controls (Cross-Platform)](#6-controls-cross-platform)
+7. [Game Modes](#7-game-modes)
+8. [Battlefield Map Design](#8-battlefield-map-design)
+9. [Progression & Retention](#9-progression--retention)
+10. [Reward System](#10-reward-system)
+11. [Monetization](#11-monetization)
+12. [Lobby, Social & Multiplayer](#12-lobby-social--multiplayer)
+13. [Localization](#13-localization)
+14. [Asset Configuration](#14-asset-configuration)
+15. [UI/UX](#15-uiux)
+16. [Audio](#16-audio)
+17. [Technical Notes](#17-technical-notes)
+18. [Nuance & Feel](#18-nuance--feel)
+19. [Out of Scope (v1)](#19-out-of-scope-v1)
 
 ---
 
 ## 1. Vision & Concept
 
-**One-line pitch:** Creative, unpredictable mini golf for everyone — easy to pick up, satisfying to master.
+**One-line pitch:** A combo-driven hack-and-slash adventure where Shaolin monks battle an invading demon army through gated combat arenas — built as a spiritual successor to *Mortal Kombat: Shaolin Monks*, reforged for co-op Roblox play.
 
-**Core fantasy:** A golfer traveling wild themed worlds, pulling off perfect trick shots, reacting to chaotic course events, and competing with friends across increasingly creative obstacle courses.
+**Core fantasy:** A Shaolin disciple wielding a chosen weapon and forbidden ultimate technique, smashing through waves of enemies, cracking open temple treasuries for relics, and growing from novice to legendary master — solo or with up to 3 friends.
+
+**Story pillar:** The Jade Serpent Clan, an army of corrupted warriors and undead soldiers led by the warlord Nezhar, has invaded the Shaolin temple grounds. Player-monks fight through the temple, surrounding villages, forests, mountains, and finally the Clan's underworld stronghold to repel the invasion and defeat Nezhar.
 
 **Design pillars:**
-1. **Accessible** — anyone can play a hole in 30 seconds without a tutorial
-2. **Unpredictable** — every round feels fresh via chaos modifiers, event hazards, and dynamic obstacles
-3. **Social** — spectating, reacting, and competing is as fun as playing
-4. **Mastery ceiling** — optimal angles, spin, and trick shots reward deep play without gating casual players
+1. **Combo mastery** — attack strings, counters, and weapon combos are simple to start, deep to master
+2. **Gated spectacle** — combat arenas lock players in until cleared, escalating tension wave by wave, mirroring MKSM's signature encounter design
+3. **Loot the world** — nearly everything in a battlefield is breakable and rewards the player for breaking it
+4. **Skill over spend** — combat power comes from player skill and unlocked technique, never from a purchase; money buys looks and time saved, not strength
 
 **Differentiators:**
-- Wide variety of themed environments, each with unique gimmicks, not just reskins
-- Optional chaos modifiers create memorable, funny moments
-- Secret shortcuts discoverable through experimentation
-- Zero pay-to-win; cosmetic depth drives long-term spending
+- Authentic MKSM-style gated arena combat with weapon pickup/disarm/throw and environmental finishers
+- Deep 4-slot cosmetic customization (Head / Body / Arm / Leg) independent of combat loadout
+- Weapon + Ultimate loadout choice changes playstyle, not power level
+- Destructible-everything battlefields feeding a relic-based combo unlock economy, just like the original game's Koins-for-combos shop
 
 ---
 
 ## 2. Core Loop
 
 ```
-Play Courses
+Lobby (customize, shop, train, socialize)
     │
     ▼
-Earn Rewards (Coins, XP, Stars)
+Select Chapter → Form Party (solo or up to 4)
     │
     ▼
-Unlock Cosmetics
+Enter Battlefield Map
     │
     ▼
-Master Difficult Maps
+Traversal Segment (platforming, exploration, hidden relics)
     │
     ▼
-Compete With Friends
+Arena Gate Seals ── Combat Wave(s) ── Gate Opens on Clear
+    │
+    ├── Loop through multiple arenas per chapter
+    ▼
+Mini-Boss / Boss Arena
     │
     ▼
-Discover New Challenges ──► back to Play Courses
-```
-
-### Per-Round Loop
-
-```
-Lobby (socialize, customize, vote on course)
-    │
-    ▼
-Hole Preview (3s flyover, skippable)
-    │
-    ▼
-Aim → Set Power → Shoot → Ball Resolves
-    │
-    ├── Sinks → Score recorded → XP/coin pulse → Next Hole
-    └── Max strokes hit → Auto-sink (over par) → Next Hole
-    │
-    ▼
-Course Complete → Score Summary → Reward Screen
+Chapter Complete → Reward Screen (XP, Coins, Relics, Gear)
     │
     ▼
 Return to Lobby
 ```
 
-**Session length target:** 5–15 min per course (9-hole ~8 min, 18-hole ~15 min).
+### Per-Arena Combat Loop
 
-**Dopamine hooks per hole:**
-- Hole-in-one: full server announcement + fireworks
-- Near-miss lip-out: cinematic slow-mo + crowd "ooh"
-- Trick shot detection: shows "Trick Shot!" overlay when ball bounces off 2+ surfaces
-- Shortcut discovery: first-time bonus coins for finding secret path
-- Streak bonus: 3 consecutive pars or better → +50 coins
+```
+Enter arena zone
+    │
+    ▼
+Gate seals behind party (no retreat, no reinforcements from outside)
+    │
+    ▼
+Enemies spawn in wave(s) ── Player(s) fight, break crates for drops
+    │
+    ▼
+Enemy staggered → Finishing Move available (bonus reward)
+    │
+    ▼
+All waves cleared → Gate unseals → Loot chest spawns
+    │
+    ▼
+Continue to next arena / traversal segment
+```
+
+**Session length target:** 10–20 min per chapter (short chapter ~10 min, boss chapter ~20 min).
+
+**Dopamine hooks per encounter:**
+- Combo milestone (10/25/50 hit combo) → on-screen counter flashes, screen shake, unique callout
+- Finishing move on staggered enemy → brief slow-mo + particle burst + bonus relic drop
+- Crate/urn break → coin/relic pop-out with satisfying crunch sound and item fly-to-HUD animation
+- Flawless arena clear (no damage taken) → "Flawless!" banner + bonus Coins
+- Boss defeat → full-screen victory cinematic + party-wide reward pulse
 
 ---
 
-## 3. Gameplay Mechanics
+## 3. Combat Mechanics
 
-### 3.1 Aiming
+### 3.1 Movement & Traversal
 
-- Camera orbits ball; player rotates aim arrow horizontally
-- Arrow rendered on ground with distance guide dots
-- Optional **Aim Assist** toggle (default ON for mobile, OFF for PC/console)
-- Trajectory preview arc shows for first ~30% of projected path (not full — preserves skill)
+- Run, jump, double-jump (unlocked via skill tree), ledge grab/climb, wall-run on marked surfaces
+- Dodge roll with brief invincibility frames (i-frames ~0.2s)
+- Traversal segments between arenas include light platforming and environmental puzzles (levers, pressure plates, collapsing walkways) — echoes MKSM's exploration beats between fights
 
-### 3.2 Power
+### 3.2 Basic Attacks
 
-- Hold input activates oscillating power bar; release fires
-- Bar grows → shrinks → repeats at medium tempo
-- Slight non-linear speed: fast at extremes, slightly slower in middle (rewards precision)
-- Power level capped server-side (no client exploit bypass)
+- **Light Attack** — fast, low damage, chains into long combo strings
+- **Heavy Attack** — slow, high damage, breaks enemy block/guard
+- Attack inputs buffer into combo strings; string length and finisher unlock via the Combo Scroll system (§10.3)
+- Air combo: light/heavy attacks usable on airborne enemies or after a launcher hit
+- Running attack: sprint + attack triggers a forward lunge strike, good for closing distance or interrupting ranged enemies
 
-### 3.3 Ball Physics
+### 3.3 Block, Parry & Dodge
 
-- Roblox physics engine + custom damping for consistent, satisfying roll
-- **Spin system:** hold spin input + directional input during power-hold applies side/back/topspin
-- Spin visible as ball rotation in flight
-- Surface material determines friction and bounce (all values in `BallConfig.lua`)
-- Ball "at rest" when velocity < threshold for 0.5s, or after 3s timeout (auto-rest)
+- Hold Block to reduce incoming damage and prevent stagger buildup
+- **Perfect Parry** — block input timed within a short window before impact fully negates damage and stuns the attacker, opening a free hit
+- Dodge roll avoids damage entirely and repositions the player; spammable but has a short cooldown to prevent invincibility abuse
 
-### 3.4 Obstacles & Hazards
+### 3.4 Grapple, Throw & Environmental Kills
 
-| Type | Behavior |
-|---|---|
-| Moving platform | Horizontal/vertical slide, predictable period |
-| Rotating barrier (windmill) | Timing-based blocker, variable RPM by hole |
-| Jump pad | Launches ball on contact, fixed angle and force |
-| Portal | Ball exits at paired portal, preserves velocity direction |
-| Wind zone | Applies constant lateral force to airborne ball |
-| Collapsing bridge | Activates on ball contact, resets after 5s |
-| Gravity flipper | Reverses gravity within zone boundary |
-| Bumper | Elastic bounce, configurable coefficient |
-| Water hazard | Ball resets to last dry position, +1 stroke penalty |
-| Sand trap | High friction, kills roll |
-| Ramp | Launches ball along incline normal |
-| Secret shortcut | Hidden path that bypasses obstacles — rewards exploration |
+- Grab a staggered enemy to throw them into another enemy (damages both) or into an environmental hazard (spikes, fire pits, chasms, temple bells) for an instant kill and bonus relic drop — signature MKSM mechanic
+- Grabbed enemies can also be used as a human shield against ranged attacks for 1–2 hits
 
-### 3.5 Trick Shot System
+### 3.5 Weapon System
 
-A trick shot is detected when the ball contacts 2+ non-green surfaces before sinking.
+- Player equips one **Main Weapon** from the Weapon Loadout (§5.2); it defines their combo tree and Ultimate flavor
+- **Weapon Pickup** — dropped/disarmed enemy weapons and environmental weapons (spears off racks, torches, prop staffs) can be picked up as a temporary secondary weapon with its own short combo and a throw option
+- **Disarm** — landing a Heavy Attack on a blocking weapon-enemy has a chance to knock their weapon free, leaving them vulnerable and the weapon pickable
+- **Weapon Throw** — thrown weapons deal solid ranged damage but are lost on impact unless retrieved from the enemy/ground afterward
+- Main Weapon can never be lost; only picked-up secondary weapons are consumable
 
-| Trick | Condition | Bonus |
+### 3.6 Ultimate Attack
+
+- Each Main Weapon has one **Ultimate Technique** — a screen-clearing, cinematic special move unique to that weapon category (see §5.2 table)
+- **Chi Meter** fills by landing hits, chaining combos, and taking damage; caps at 100
+- Activating the Ultimate at full meter unleashes the technique and resets the meter
+- Ultimate power is fixed by design — only its visual effect (aura color, particle trail, impact FX) is cosmetically customizable via the shop
+
+### 3.7 Combo & Style Score
+
+- Every hit within a rolling ~2s window extends the player's live Combo Counter (HUD, top-center)
+- Combo Counter contributes to a per-arena **Style Score**, which scales bonus Coin/relic rewards (see §10.1)
+- Dropping combo (getting hit, or idle too long) resets the counter but does not penalize already-earned rewards
+
+### 3.8 Destructible Objects
+
+- Battlefields are scattered with breakable containers: wooden crates, clay urns, supply barrels, and locked jade chests
+- Each container has a hit-point pool (1–4 hits) and a themed drop table (see §10.2)
+- Some containers are hidden behind traversal puzzles or off the main path — rewards exploration, same spirit as a secret shortcut
+- Containers respawn only on a fresh run of the map; they do not regenerate mid-run
+
+### 3.9 Stagger, Poise & Finishing Moves
+
+- Enemies have a hidden Poise meter; sustained hits fill it and trigger a **Staggered** state (visual stumble, glowing outline)
+- Staggered enemies can be Finished with a context Finishing Move input — a short scripted takedown animation (stylized light-dissolve effect, no gore, Roblox-safe) that grants bonus Coins and guarantees a relic drop
+- Bosses use Poise thresholds to gate phase transitions instead of a one-shot finisher (see §4.5)
+
+---
+
+## 4. Enemy System
+
+Modeled directly on *Mortal Kombat: Shaolin Monks'* gated-arena combat: players are sealed into a combat zone until every enemy in the current wave is defeated, enemies attack in a rotating ring rather than all at once, and breaking scenery for currency is core to the loop.
+
+### 4.1 Arena Gate Encounters
+
+- Entering a marked arena zone seals invisible gates behind and ahead of the party
+- Gates do not open until all active wave(s) are cleared — no retreating, no outside reinforcements
+- Multi-wave arenas spawn the next wave a beat after the previous is cleared (brief breather, not instant)
+- Arena floor is littered with destructible containers players can break mid-fight for sustain (coins, occasional health/chi orb)
+
+### 4.2 Enemy Roles
+
+| Role | Behavior | Notes |
 |---|---|---|
-| Bank Shot | 1 wall bounce before sink | +10 coins |
-| Double Bank | 2 wall bounces before sink | +25 coins |
-| Ricochet | Ball contacts obstacle then sinks | +20 coins |
-| Portal Ace | Sink via portal on first try | +50 coins |
-| Gravity Ace | Hole-in-one through gravity zone | +75 coins |
+| Grunt | Basic melee, simple 1-hit attack pattern | Fodder, low health, teaches combo timing |
+| Soldier | Blocks incoming attacks, punishes unsafe strings | Requires Heavy Attack or Disarm to open up |
+| Heavy Bruiser | Slow, armored, high damage, high poise | Interrupts player combos if not staggered first |
+| Ranged Archer | Kites at range, fires arrows/throwing blades | Priority target; closing distance is key |
+| Assassin | Fast, low health, flanks and dodges | Punishes players who stand still |
+| Elite Champion | Mini-boss variant of any role with an expanded moveset and a unique Ultimate-style attack | Appears mid-chapter, guards a loot vault |
+| Boss | Full arena-ending unique enemy with multi-phase moveset | One per chapter, see §4.5 |
 
-### 3.6 Stroke Limit
+### 4.3 Crowd Behavior & Wave Composition
 
-- Each hole has a par value (2–6) and a max strokes cap (par + 3)
-- Reaching cap auto-sinks ball; score = cap value
-- Prevents stalling in multiplayer matches
+- Only 2–3 enemies actively attack the player at once; the rest circle at range (the MKSM "ring" behavior) — keeps fights readable in co-op with up to 4 players and multiple enemies on screen
+- Wave composition scales with chapter difficulty tier: early chapters lean Grunt/Soldier heavy, later chapters mix in Heavy/Ranged/Assassin, endgame chapters regularly field Elite Champions mid-wave
+- In co-op, wave enemy count and health scale with party size so difficulty stays consistent solo through full party
+
+### 4.4 AI Behavior Rules
+
+- Aggro radius: enemies engage once a player enters detection range or deals/receives damage nearby
+- Attack cooldown per enemy prevents overlapping hits from feeling like a stun-lock
+- Concurrent attacker cap (2–3) enforced server-side via an attack queue token system
+- Anticipation tells (windup flash, audio cue) telegraph attacks ~0.3–0.5s before impact so reads are fair, not memorization-only
+
+### 4.5 Mini-Boss & Boss Design
+
+- Bosses fight in a dedicated arena with no destructible containers mid-fight (focus on the duel) but drop a large loot burst on defeat
+- Health is split into phases (typically 3); crossing a phase threshold triggers a brief invulnerable transition animation and a moveset/environment change (e.g., arena hazards activate, adds spawn)
+- Every boss has one grab-counter window and one parry-punish window per phase, rewarding players who learned the boss's patterns
+- Elite Champions use a condensed 1-phase version of this same structure
+
+### 4.6 Enemy Factions per Chapter
+
+| Chapter | Faction Reskin | Signature Enemy |
+|---|---|---|
+| Temple Courtyard | Jade Serpent Cultists | Cultist Soldier (blocks, chants buffs) |
+| Burning Village | Raider Warband | Torch Raider (sets terrain on fire) |
+| Bamboo Forest | Shadow Stalkers | Camouflaged Assassin |
+| Mountain Pass | Frost Wardens | Ice Archer (slowing arrows) |
+| Ancient Catacombs | Restless Dead | Bone Grappler (grabs from off-screen) |
+| Sky Pagoda | Wind Monks (corrupted) | Aerial Duelist (air-combo specialist) |
+| Underworld Gate | Nezhar's Legion | Wraith Bruiser (phases through blocks) |
+| Warlord's Throne | Nezhar's Honor Guard | Elite Champion escort → Nezhar (final boss) |
 
 ---
 
-## 4. Controls (Cross-Platform)
+## 5. Character Customization
 
-All three platforms must reach full feature parity before launch. No feature locked to one platform.
+### 5.1 Accessory Slots
 
-### 4.1 PC (Mouse + Keyboard)
+| Slot | Examples | Affects Gameplay? |
+|---|---|---|
+| Head | Headbands, monk hoods, masks, horned helms | No — cosmetic only |
+| Body | Robes, armor sets, sashes | No — cosmetic only |
+| Arm | Bracers, wraps, gauntlet skins | No — cosmetic only |
+| Leg | Sash-wraps, greaves, sandals | No — cosmetic only |
+
+Accessories are obtained from the Cosmetic Shop, Battle Pass, crates, and chapter-completion rewards. Rarity is purely visual flair (particle trims, glow tiers).
+
+### 5.2 Weapon Loadout
+
+One Main Weapon equipped at a time; swappable freely in the Lobby, locked for the duration of a battlefield run.
+
+| Weapon Type | Playstyle | Ultimate Technique |
+|---|---|---|
+| Twin Blades | Fast, low-reach combo strings | Whirlwind Strike — spinning AoE flurry |
+| War Staff | Medium reach, sweeping crowd control | Heaven's Sweep — knockback shockwave |
+| Hook Swords | High mobility, chain-grapple pulls enemies in | Serpent's Coil — pulls all nearby enemies then multi-hits |
+| Iron Gauntlets | Slow, highest poise damage | Mountain Breaker — single massive ground-slam nova |
+| Battle Glaive | Longest reach, arcing sweeps | Dragon's Arc — spinning traveling slash line |
+
+All five weapons deal balanced effective damage-per-second when played well — the choice is playstyle, not power. Weapon **skins** (recolors/effects) are the monetized layer, not the weapon's stats.
+
+### 5.3 Cosmetic Rarity Tiers
+
+Common → Uncommon → Rare → Epic → Legendary, applied to accessories, weapon skins, and Ultimate visual effects. Higher tiers add richer particle/glow effects only.
+
+---
+
+## 6. Controls (Cross-Platform)
+
+All three platforms reach full feature parity before launch. No feature locked to one platform.
+
+### 6.1 PC (Mouse + Keyboard)
 
 | Action | Input |
 |---|---|
-| Rotate aim | Mouse move left/right |
-| Hold power | Left mouse button hold |
-| Fire | Left mouse button release |
-| Apply spin | A / D while holding LMB |
-| Camera zoom | Scroll wheel |
-| Camera reset | R |
-| Emote menu | E |
-| Scoreboard | Tab |
-| Settings | Escape |
+| Move | WASD |
+| Light Attack | Left mouse button |
+| Heavy Attack | Right mouse button |
+| Block / Parry | Hold Shift |
+| Dodge Roll | Ctrl / Spacebar-tap-direction |
+| Grab / Throw | F |
+| Pick Up / Interact | E |
+| Throw Held Weapon | Q |
+| Ultimate | R (when charged) |
+| Camera | Mouse move |
+| Lock-on Target | Middle mouse click |
+| Party / Scoreboard | Tab |
 
-### 4.2 Mobile (Touch)
+### 6.2 Mobile (Touch)
 
 | Action | Input |
 |---|---|
-| Rotate aim | One-finger drag on aim zone (left half of screen) |
-| Hold power | Tap + hold power button (bottom-right) |
-| Fire | Release power button |
-| Apply spin | Two-finger swipe during hold |
-| Camera pan | Two-finger drag |
-| Camera zoom | Pinch gesture |
-| Emote menu | Emote button (bottom-right corner) |
-| Scoreboard | Scoreboard icon (top-right) |
+| Move | Left virtual joystick |
+| Light Attack | Attack button (bottom-right) |
+| Heavy Attack | Hold Attack button |
+| Block / Parry | Shield button |
+| Dodge Roll | Swipe on joystick / Dodge button |
+| Grab / Throw | Grab button |
+| Ultimate | Ultimate button (glows when charged) |
+| Camera | Right-side drag |
+| Lock-on Target | Tap enemy portrait / auto-assist |
 
 **Mobile UX rules:**
 - All interactive buttons ≥ 44px tap target
-- Power bar rendered vertically on mobile (thumb-friendly)
-- Aim Assist ON by default; disable in Settings
-- No input combination that requires simultaneous mouse + keyboard equivalent
+- Auto-lock-on assist ON by default on mobile; toggle in Settings
+- Simplified single-tap combo access — no required multi-touch gestures for core combos (two-finger inputs reserved for optional advanced techniques only)
 
-### 4.3 Console (Gamepad)
+### 6.3 Console (Gamepad)
 
 | Action | Input |
 |---|---|
-| Rotate aim | Left stick |
-| Hold power | Right trigger (hold → release) |
-| Apply spin | Left trigger (hold) + left stick direction |
+| Move | Left stick |
+| Light Attack | X / Square |
+| Heavy Attack | Y / Triangle |
+| Block / Parry | Left trigger (hold) |
+| Dodge Roll | B / Circle |
+| Grab / Throw | Right bumper |
+| Pick Up / Interact | A / Cross |
+| Throw Held Weapon | Left bumper |
+| Ultimate | Right trigger (when charged) |
 | Camera | Right stick |
-| Camera zoom | D-pad up/down |
-| Emote menu | D-pad left |
-| Scoreboard | Select / View |
-| Settings | Start / Menu |
+| Lock-on Target | Click right stick |
 
 ---
 
-## 5. Game Modes
+## 7. Game Modes
 
-### 5.1 Stroke Play (Default)
-Fewest total strokes across all holes wins. Standard scoring. Available solo and multiplayer (up to 8 players). All players shoot simultaneously — no turn-waiting.
+### 7.1 Story Chapters (Default)
+Solo or co-op (up to 4). Linear arena-gated progression through the chapter list (§8.1). Full rewards.
 
-### 5.2 Casual / Quickplay
-No competitive scoring. Infinite retries per hole. XP and coins reduced 50%. Ideal for course exploration and socializing.
+### 7.2 Practice / Free Roam
+Replay any previously cleared chapter solo, free retry, reduced rewards (50%). Used for farming Combo Scroll relics or mastering a boss.
 
-### 5.3 Race Mode
-First to sink each hole scores a point. Simultaneous turns. Most points after 9 holes wins. Tie on points → compare total strokes.
+### 7.3 Trial Rush (Weekly)
+Fixed-seed gauntlet of back-to-back arenas with no traversal filler, ranked by clear time and combo score on a weekly leaderboard. Top finishers earn an exclusive seasonal accessory.
 
-### 5.4 Daily Challenge
-One randomly seeded course per day. Global leaderboard. One attempt per account. Exclusive badge for top 10 finishers. Resets midnight UTC.
+### 7.4 Daily Relic Hunt
+One randomly modified chapter per day (extra hidden crates, remixed enemy waves). One bonus-reward attempt per account per day. Resets midnight UTC.
 
-### 5.5 Weekly Tournament
-18-hole course, fixed seed, 7-day window. Bracket-style; top 3 earn exclusive seasonal cosmetic. Resets Sunday midnight UTC.
-
-### 5.6 Chaos Mode
-Standard stroke play with active **Chaos Modifiers** (see §7). Opt-in per lobby. Rewards standard XP/coins + chaos bonus if modifier was active all round.
-
-### 5.7 Practice Mode
-Solo, free retry, no rewards. Used for learning holes, testing trick shots, or exploring shortcuts.
+### 7.5 Boss Rematch
+Replay any defeated boss directly, skip traversal and prior arenas. Reduced but guaranteed rare+ relic reward. Good for Ultimate/skin farming and speedrun practice.
 
 ---
 
-## 6. Course Design
+## 8. Battlefield Map Design
 
-### 6.1 Themes
+### 8.1 Chapters
 
-Each theme is a self-contained visual world with matching obstacles, terrain materials, ambient audio, skybox, and unique gameplay gimmick.
+Each chapter is a self-contained linear battlefield: traversal segments connecting 3–5 combat arenas, ending in a mini-boss or boss arena. See §4.6 for enemy faction per chapter.
 
-| Theme | Setting | Unique Gimmick |
+| Chapter | Setting | Signature Hazard/Gimmick |
 |---|---|---|
-| Peaceful Forest | Calm woodland | Windmills, leaf blowers, log ramps |
-| Tropical Island | Beach paradise | Wave surge zones, coconut cannons |
-| Haunted Village | Spooky graveyard | Ghost bumpers, gravestones that rise |
-| Snowy Mountain | Alpine slopes | Ice surfaces, avalanche hazard, snowdrift sand traps |
-| Floating Sky Islands | Clouds, sky bridges | Wind currents, sky falls (OOB fast) |
-| Volcano Arena | Lava world | Heat updraft zones, lava hazard replacing water |
-| Fantasy Castle | Medieval | Drawbridge collapse, catapult launchers |
-| Neon Cyber World | Cyberpunk city | Speed boost rails, laser walls, gravity zones |
-| Mysterious Night | Moonlit courses | Reduced visibility, glow-in-dark hazards |
+| Temple Courtyard | Opening tutorial temple grounds | Collapsing scaffolding, temple bells (throw kill) |
+| Burning Village | Village under siege | Spreading fire zones, collapsing rooftops |
+| Bamboo Forest | Dense bamboo groves | Breakable bamboo cover, ambush ranged enemies |
+| Mountain Pass | Icy cliffside trail | Ice surfaces (reduced footing), rockslide hazard |
+| Ancient Catacombs | Underground tomb | Darkness pockets, bone-trap floor tiles |
+| Sky Pagoda | Vertical pagoda tower | Wind-gust platforming, fall hazards |
+| Underworld Gate | Demon threshold realm | Corrupted ground damage-over-time zones |
+| Warlord's Throne | Nezhar's final stronghold | Multi-phase boss arena, escort gauntlet |
 
-### 6.2 Hole Anatomy
+### 8.2 Arena Anatomy
 
-- **Tee box** — flat start, ball spawns here, camera previews hole
-- **Fairway** — main path, standard friction
-- **Green** — area around hole, low friction, subtle directional slope
-- **Hazards** — water/lava, sand, OOB zones, theme-specific traps
-- **Obstacles** — theme-matched mechanical elements
-- **Shortcuts** — hidden paths discoverable by experimentation, bonus coins on first find
-- **Hole** — small magnet pull at < 0.5 studs radius so sinks feel earned
+- **Traversal Segment** — platforming/exploration between fights, light puzzle gating, hidden relic containers off the main path
+- **Combat Arena** — gated zone, one or more enemy waves, destructible containers scattered throughout
+- **Loot Room** — optional side room behind a puzzle or Elite Champion guard, contains a guaranteed rare+ chest
+- **Boss Arena** — dedicated multi-phase duel space, no side containers, big reward burst on clear
 
-### 6.3 Difficulty Tiers
+### 8.3 Difficulty Tiers
 
-| Tier | Par Range | Obstacles | Unlock |
+| Tier | Chapters | Enemy Mix | Unlock |
 |---|---|---|---|
-| Beginner | 2–3 | 0–1 moving | Default |
-| Intermediate | 3–4 | 2–3 mixed | Level 5 |
-| Advanced | 4–5 | 3–5, precise timing required | Level 15 |
-| Expert | 5–6 | Complex, multi-obstacle, tight margins | Level 30 |
+| Novice | Temple Courtyard, Burning Village | Grunt/Soldier | Default |
+| Adept | Bamboo Forest, Mountain Pass | + Ranged/Assassin | Level 8 |
+| Veteran | Ancient Catacombs, Sky Pagoda | + Heavy/Elite Champion | Level 18 |
+| Master | Underworld Gate, Warlord's Throne | Full mix + Boss gauntlet | Level 30 |
 
-### 6.4 Course Construction Rules
+### 8.4 Construction Rules
 
-- Every hole must be completable at par by a skilled player — no impossible shots
-- Player must always see hole or a clear directional clue from tee box
-- At least one discoverable trick shot angle per hole
-- At least one secret shortcut per course (not per hole)
-- Every hole playtested on all three control schemes before release
-- Holes must be fun to watch as a spectator (obstacle visibility matters)
+- Every arena must be clearable at intended party size without unavoidable damage — enemy tells must always be fair
+- At least one hidden relic container per chapter, off the critical path
+- Every chapter playtested on all three control schemes before release
+- Arenas must read clearly in 4-player co-op — enemy silhouettes and telegraphs stay legible even with 4 players and 6+ enemies on screen
 
 ---
 
-## 7. Chaos Modifiers
+## 9. Progression & Retention
 
-Optional, opt-in per lobby. Host enables before match starts. Creates unpredictable, funny moments.
+### 9.1 Player Level (XP)
 
-| Modifier | Effect |
+XP per chapter = `BaseXP × DifficultyMultiplier × StyleScoreMultiplier`
+
+| Performance | Multiplier |
 |---|---|
-| Low Gravity | Ball floats slowly, air time x3 |
-| Slippery World | All surfaces reduced friction to near-zero |
-| Giant Fans | Large fans placed randomly across course, active during shots |
-| Moving Hazards | All static obstacles gain slow random movement |
-| Tiny Ball | Ball hitbox 50% smaller, rolls faster |
-| Big Ball | Ball hitbox 200% larger, knocks obstacles |
-| Random Wind | Gusts fire in random directions every 5s |
-| Surprise Events | Random event triggers mid-hole (quake, rain, disco lights + slippery) |
+| Flawless clear (no damage taken) | 2.5× |
+| High combo average | 2× |
+| Standard clear | 1× |
+| Multiple deaths/retries | 0.5× |
 
-- Maximum 2 modifiers active simultaneously (performance bound, clarity bound)
-- Chaos matches award standard coins/XP + 10% chaos bonus
-- Chaos Mode has its own weekly leaderboard (separate from clean stroke play)
+Leveling grants **Skill Points**, not raw stat power (see §9.2). Combat power stays skill-driven; leveling unlocks playstyle depth and content gates: new chapters, game modes, cosmetic slots, seasonal content.
 
----
+### 9.2 Skill Tree
 
-## 8. Progression & Retention
+- Skill Points spent on: extended combo strings, double-jump, faster dodge cooldown, longer parry window, throw-weapon retrieval speed, minor capped health/chi pool growth (small, reaches its ceiling by Level 30 — a F2P player and a top spender arrive at the same combat ceiling)
+- Tree is shared across all weapons for universal nodes; each weapon also has a small weapon-specific branch (extra combo finisher, unique juggle starter)
 
-### 8.1 Player Level (XP)
+### 9.3 Mastery Stars
 
-XP per hole = `BaseXP × DifficultyMultiplier × ScoreMultiplier`
+- Each chapter: 0–3 stars based on Style Score, damage taken, and clear time
+- Milestone star totals (15, 40, 75, 120) unlock exclusive permanent cosmetics
 
-| Score | Multiplier |
-|---|---|
-| Hole-in-one | 3× |
-| Eagle (par - 2) | 2.5× |
-| Birdie (par - 1) | 2× |
-| Par | 1× |
-| Bogey (par + 1) | 0.5× |
-| Double bogey+ | 0.1× |
-
-Level gates unlock: new course themes, game modes, cosmetic slots, seasonal challenges.
-
-### 8.2 Stars
-
-- Each hole: 0–3 stars based on strokes vs par
-- Stars totaled per course for profile display
-- Milestone totals (50, 150, 300, 500 stars) unlock exclusive permanent items
-
-### 8.3 Shortcut Discovery
-
-- First time ball travels a secret shortcut path → popup "Shortcut Discovered!" + 100 coins
-- Tracked per player per shortcut; can only earn once per shortcut
-
-### 8.4 Daily / Weekly Quests
+### 9.4 Daily / Weekly Quests
 
 Daily examples:
-- "Sink 3 holes-in-one" → 200 coins
-- "Complete 2 different themed courses" → 300 XP
-- "Trigger a trick shot" → 150 coins
+- "Land 5 Finishing Moves" → 200 Coins
+- "Break 20 destructible containers" → 150 Coins
+- "Clear a chapter without dying" → 300 XP
 
 Weekly examples:
-- "Win a Race mode match" → exclusive avatar item rental (3 days)
-- "Complete the Daily Challenge 5 days this week" → rare cosmetic crate
-- "Find 2 secret shortcuts" → 1000 coins
+- "Clear Trial Rush" → exclusive title
+- "Defeat 3 different bosses" → rare cosmetic crate
+- "Find 3 hidden relic containers" → 1000 Coins
 
-### 8.5 Streak System
+### 9.5 Streak System
 
 - Login streak tracked; day 7 = premium drop
-- Hole-in-a-row within a round: +50 coins per consecutive HIO after the first
+- In-run: consecutive Flawless arena clears grant an escalating Coin bonus per arena after the first
 
-### 8.6 Seasonal Events
+### 9.6 Seasonal Events
 
-- Tied to real-world calendar (Halloween, Christmas, Summer)
-- Event-exclusive courses active for duration
-- Limited cosmetics, badges, titles available only during event window
+- Tied to real-world calendar (Lunar New Year, Halloween, Summer)
+- Event-exclusive chapter with limited-time boss and exclusive cosmetics/titles
 
-### 8.7 Leaderboards
+### 9.7 Leaderboards
 
-- Per-course best score: all-time and weekly
+- Per-chapter best clear time and Style Score: all-time and weekly
 - Friends leaderboard (prioritized in display)
-- Ghost replay of top 3 scores available before playing hole
-- Chaos Mode separate weekly leaderboard
+- Trial Rush weekly leaderboard, separate
 
 ---
 
-## 9. Monetization
+## 10. Reward System
 
-**Philosophy:** Cosmetic-only. Zero pay-to-win. No gameplay stat, speed, or advantage purchasable with real money.
+### 10.1 Style Score → Reward Scaling
 
-### 9.1 Currency
+Every arena tracks a live Style Score built from combo length, Finishing Moves landed, and damage avoided. On arena clear, Style Score converts into a Coin/relic multiplier (see §9.1 table) applied to that arena's base reward.
+
+### 10.2 Destructible Container Drop Table
+
+| Container | HP | Drop Table |
+|---|---|---|
+| Wooden Crate | 1 hit | Coins (common), small chance Health Orb |
+| Clay Urn | 1 hit | Coins (common), small chance Chi Orb |
+| Supply Barrel | 2 hits | Coins, small chance throwable weapon (spear/torch) |
+| Jade Chest (hidden) | 3 hits | Guaranteed relic; chance for cosmetic drop |
+
+### 10.3 Combo Scroll Shop (Homage to the Koins-for-Combos system)
+
+- Coins earned from containers, enemy kills, and chapter clears are spent at the Lobby's **Sifu's Dojo** vendor
+- Coins unlock **Combo Scrolls** — new attack strings, finishers, and weapon techniques per weapon type
+- This is a direct callback to the source material's relic-for-combo shop: breaking the world open funds becoming stronger at what you already know how to do, not a stat purchase
+- Combo Scrolls are Coin-only — never purchasable with premium currency, keeping technique unlocks fully skill-economy driven
+
+### 10.4 Chest Tiers & Rarity
+
+| Chest | Source | Rarity Weights (Common/Uncommon/Rare/Epic/Legendary) |
+|---|---|---|
+| Arena Chest | Clearing a combat arena | 60/25/10/4/1 |
+| Chapter Chest | Chapter completion | 40/30/18/9/3 |
+| Boss Chest | Boss defeat | 20/30/28/16/6 |
+| Vault Chest | Hidden Jade Chest / Loot Room | 10/25/30/25/10 |
+
+- Duplicate cosmetic pulls convert to Coins at a fixed rate
+- Drop tables are published in-game for full transparency (no hidden odds)
+
+---
+
+## 11. Monetization
+
+**Philosophy:** Cosmetic and time-saving only. Combat power — weapon damage, Ultimate strength, skill tree ceiling — is never purchasable. Money buys looks and speed of unlocking things you could earn for free.
+
+### 11.1 Currency
 
 | Currency | Earn | Spend |
 |---|---|---|
-| Coins | Gameplay, quests, login, shortcuts | Basic shop items |
-| Gems | Robux purchase, rare quest reward | Premium items, bundles |
+| Coins | Gameplay: containers, enemies, chapters, quests | Combo Scrolls, basic cosmetic shop items |
+| Jade Shards | Robux purchase, rare quest reward | Premium cosmetics, bundles, crates |
 
-One-way economy: coins cannot convert to gems. Prevents pay-to-win bypass.
+One-way economy: Coins cannot convert to Jade Shards.
 
-### 9.2 Cosmetic Categories
+### 11.2 Cosmetic Categories
 
 | Category | Examples | Currency |
 |---|---|---|
-| Golf balls | Color, pattern, glow, holographic, animated | Coins / Gems |
-| Club skins | Handle color, head design, particle on swing | Coins / Gems |
-| Ball trails | Flame, rainbow, stardust, bubble, lightning | Gems |
-| Hit effects | Explosion, sparkle, confetti burst on impact | Gems |
-| Shot animations | Wind-up style, power pose, comedic swing | Gems |
-| Emotes | Celebrate dance, fail reaction, taunt, fist pump | Gems |
-| Caddies | Companion pet that follows player on course | Gems / Bundle |
-| Titles | Displayed under username ("Trick Shot King") | Quest / Event |
-| Course Pass | Early access to upcoming theme | Robux |
+| Head / Body / Arm / Leg accessories | Themed sets, seasonal exclusives | Coins / Jade |
+| Weapon skins | Recolors, particle trims, animated finishes | Jade |
+| Ultimate FX skins | Aura color, impact effect, trail | Jade |
+| Finishing Move FX | Alternate takedown light-effect styles | Jade |
+| Emotes | Bow, taunt, victory pose, meditation idle | Jade |
+| Spirit Companions | Cosmetic animal spirit that follows player in lobby and battlefield (visual only) | Jade / Bundle |
+| Titles | Displayed under username ("Flawless Disciple") | Quest / Event |
+| Chapter Cosmetic Pass | Early-access exclusive skin tied to new chapter release | Robux |
 
-### 9.3 VIP Game Pass (Robux, one-time)
+### 11.3 VIP Game Pass (Robux, one-time)
 
-- +25% XP and +25% coin gain (stacks with quests)
-- Exclusive VIP lounge in lobby with private practice putting green
+- +25% XP and +25% Coin gain (time-saver, no combat power)
+- Access to VIP Training Hall in Lobby (private practice arena vs. target dummies)
 - VIP badge on scoreboard and above head
-- Monthly exclusive cosmetic drop (auto-granted on purchase month + each subsequent month active)
+- Monthly exclusive cosmetic drop while active
 
-### 9.4 Battle Pass (Seasonal, ~60 days)
+### 11.4 Battle Pass (Seasonal, ~60 days)
 
-- 50 tiers per season
-- Free track: coins, XP boosts, basic cosmetics
-- Premium track (Robux): exclusive skins, emotes, caddie, trail, seasonal title
-- Seasonal theme matches current event course release
+- 50 tiers
+- Free track: Coins, XP boosts, basic cosmetics
+- Premium track (Robux): exclusive weapon skin, Ultimate FX, Spirit Companion, seasonal title
+- Seasonal theme matches the current event chapter
 
-### 9.5 Limited Items
+### 11.5 Limited Items
 
 - Rotating 48-hour limited cosmetics
-- Holiday bundles (Halloween, Christmas, Summer Splash)
-- Items never return after window closes — drives FOMO without being predatory
+- Holiday bundles (Lunar New Year, Halloween, Summer)
+- Items never return after the window closes
 - All limited items are cosmetic only
 
-### 9.6 Cosmetic Crates (optional, post-launch)
+### 11.6 Cosmetic Crates
 
-- Earned via gameplay or purchased with gems
-- Fixed drop table published publicly (no hidden odds)
-- Duplicate protection: 5th duplicate converts to coins
-- No Robux direct-to-crate path to comply with Roblox UGC policies
+- Earned via gameplay or purchased with Jade Shards
+- Fixed drop table published publicly (§10.4)
+- Duplicate protection: repeat pulls convert to Coins
+- No Robux-direct-to-crate path, complying with Roblox UGC policy
 
 ---
 
-## 10. Social & Multiplayer
+## 12. Lobby, Social & Multiplayer
 
-### 10.1 Lobby
+### 12.1 Lobby (Temple Hub)
 
-- Shared cozy lobby space with a practice putting green, benches, and ambient music
-- Players visible, can emote, chat, inspect others' cosmetics
-- Course vote board: players vote on next course; most votes wins (host override available)
-- VIP area for GamePass holders (separate lounge connected to main lobby)
+- Shared safe hub styled as the (liberated) temple courtyard: training dummies, Sifu's Dojo vendor, Cosmetic Shop stall, Battle Pass board, chapter select gate
+- Players visible, can emote, chat, inspect others' loadouts and cosmetics
+- VIP Training Hall accessible to GamePass holders (separate area connected to main hub)
 
-### 10.2 Simultaneous Play
+### 12.2 Party System
 
-All players shoot on the same turn simultaneously — no waiting. Reduces dead time, increases energy, makes spectating more interesting.
+- Party leader invites up to 3 friends (party of 4 total)
+- Party teleports together into the selected chapter's battlefield instance
+- Party chat channel persists across chapter loads
+- Solo players can matchmake into an open party or run fully solo — chapter difficulty scales to actual party size (§4.3)
 
-### 10.3 Spectating & Reactions
+### 12.3 Co-op Support & Revive
 
-- After finishing course, player enters Spectator Mode
-- Camera follows active players (cycle with button)
-- Spectators see floating reaction icons: 👏 🤣 😮 😬 🔥
-- Reactions visible in-world above spectator and over ball on impact
+- Downed players enter a "Fallen" state and can be revived by a nearby teammate (short revive animation, vulnerable during)
+- If the whole party is downed, the arena's current wave restarts (not the full chapter) — keeps failure low-friction
 
-### 10.4 Party System
+### 12.4 Social Hooks
 
-- Party leader invites up to 7 friends
-- Party teleports together to selected course
-- Party chat channel persists across teleports and course loads
+- Finishing Move landed → nearby teammates see a brief "FINISH!" callout
+- Flawless arena clear → party-wide banner
+- Boss defeat → full hub-wide announcement banner (visible to players currently in the Lobby) + fireworks over the chapter-select gate
 
-### 10.5 Ghost Replays
-
-- Top 3 scores per course stored as ghost playback data
-- Player's personal best ghost always available
-- Ghosts render as translucent ball with trail; no collision with live ball
-
-### 10.6 Private Servers
+### 12.5 Private Servers
 
 - Standard Roblox private server (Robux or free per platform policy)
-- Host sets: course, mode, chaos modifiers, stroke limit override
-
-### 10.7 Social Hooks Per Shot
-
-- Ball approaches lip without sinking → slow-mo camera + "oh no" sound
-- Trick shot detected → "TRICK SHOT!" overlay for all spectators
-- Hole-in-one → server-wide announcement banner + fireworks
-- Shortcut found → local discovery animation, quiet (doesn't spoil for others)
+- Host sets: chapter, party difficulty scaling override, cosmetic-only "mirror match" dummy settings for practice
 
 ---
 
-## 11. Localization
+## 13. Localization
 
-### 11.1 Supported Languages (Launch)
+### 13.1 Supported Languages (Launch)
 
 | Language | Code | Notes |
 |---|---|---|
@@ -490,315 +585,322 @@ All players shoot on the same turn simultaneously — no waiting. Reduces dead t
 
 Post-launch priority: Japanese (`ja`), Thai (`th`), Turkish (`tr`), Korean (`ko`).
 
-### 11.2 Localization System
+### 13.2 Localization System
 
 - All user-facing strings in Roblox `LocalizationTable`
-- String keys use namespace prefix: `ui.button.play`, `hole.name.windmill`, `hud.label.stroke`
+- String keys use namespace prefix: `ui.button.play`, `enemy.name.wraithbruiser`, `hud.label.combo`
 - No hardcoded strings in UI scripts — always via `LocalizationService:GetTranslator()`
 - Numeric formatting respects locale (decimal/thousands separators)
-- Date/time in player's local timezone
-- Golf terminology localized where a natural local equivalent exists; not just transliterated
+- Combat/enemy terminology localized with natural equivalents, not just transliterated
 
-### 11.3 Cultural Sensitivity
+### 13.3 Cultural Sensitivity
 
-- No themes referencing specific religious symbols
-- Avatar items reviewed per major market before release
-- Humor in chaos modifiers reviewed for cultural neutrality
+- Combat is stylized (light-dissolve Finishing Moves, no blood/gore) to stay broadly appropriate and Roblox-policy-safe
+- No themes referencing specific real-world religious practice — the "Shaolin" framing draws on wuxia/kung-fu action fiction tropes, not real religious depiction
+- Avatar items and chapter content reviewed per major market before release
 
-### 11.4 RTL Preparedness
+### 13.4 RTL Preparedness
 
 - Arabic/Hebrew not in v1 scope
-- UI layout must use anchored/relative positioning — no hardcoded LTR pixel offsets
+- UI layout uses anchored/relative positioning — no hardcoded LTR pixel offsets
 - Allows future RTL flip without layout rewrite
 
 ---
 
-## 12. Asset Configuration
+## 14. Asset Configuration
 
 > **Rule: All tunable values live in one config file per domain. No magic numbers in gameplay or UI scripts. All asset IDs centralized.**
 
-### 12.1 Config File Structure
+### 14.1 Config File Structure
 
 ```
 src/
   shared/
     config/
-      BallConfig.lua          -- ball physics per surface, spin, rest threshold
-      CourseConfig.lua        -- course metadata, hole par values, difficulty tiers
-      ObstacleConfig.lua      -- obstacle speed, bounce coefficient, period, force values
-      ChaosConfig.lua         -- modifier definitions, strength values, max active count
-      ShopConfig.lua          -- item definitions, prices, bundle contents, Gem product IDs
-      ProgressionConfig.lua   -- XP formula, level thresholds, reward table, streak config
-      AudioConfig.lua         -- all sound asset IDs, volumes, pitch ranges
-      MonetizationConfig.lua  -- Robux product IDs, GamePass IDs, currency exchange rates
-      UIConfig.lua            -- colors, font sizes, layout constants, particle limits
-      LocalizationConfig.lua  -- supported locales, fallback chain
-      TrickShotConfig.lua     -- trick shot detection rules, reward values
+      CombatConfig.lua         -- attack damage, combo timing windows, stagger/poise thresholds
+      WeaponConfig.lua         -- weapon type stats, combo trees, Ultimate definitions
+      EnemyConfig.lua          -- enemy stats, AI behavior params, aggro/attacker-cap values
+      ChapterConfig.lua        -- chapter metadata, arena refs, difficulty tier gates
+      LootConfig.lua           -- destructible container drop tables, chest tiers, rarity weights
+      AccessoryConfig.lua      -- accessory slot items, rarity, unlock source
+      ProgressionConfig.lua    -- XP formula, level thresholds, skill tree node costs
+      ShopConfig.lua           -- item definitions, prices, bundle contents, Jade product IDs
+      MonetizationConfig.lua   -- Robux product IDs, GamePass IDs, currency exchange rates
+      AudioConfig.lua          -- all sound asset IDs, volumes, pitch ranges
+      UIConfig.lua             -- colors, font sizes, layout anchors, responsive breakpoints
+      LocalizationConfig.lua   -- supported locales, fallback chain
 ```
 
-### 12.2 BallConfig.lua (example shape)
+### 14.2 CombatConfig.lua (example shape)
 
 ```lua
 return {
-  Physics = {
-    DefaultBounce     = 0.4,   -- CoefficientOfRestitution
-    DefaultFriction   = 0.5,
-    RestThreshold     = 0.05,  -- studs/s below which ball is "at rest"
-    AutoRestTimeout   = 3,     -- seconds before forced rest
-    MaxPowerVelocity  = 80,    -- studs/s at full power bar
-    SpinMultiplier    = 0.3,
-    MagnetRadius      = 0.5,   -- studs; hole magnet pull radius
+  Attacks = {
+    LightDamage       = 8,
+    HeavyDamage       = 20,
+    ComboWindow       = 0.6,   -- seconds to chain next input
+    ParryWindow       = 0.15,  -- seconds before impact for a perfect parry
+    DodgeIFrames      = 0.2,
+    DodgeCooldown     = 0.8,
   },
-  Surfaces = {
-    Fairway  = { Friction = 0.50, Bounce = 0.30 },
-    Green    = { Friction = 0.30, Bounce = 0.20 },
-    Sand     = { Friction = 0.85, Bounce = 0.10 },
-    Ice      = { Friction = 0.05, Bounce = 0.50 },
-    Rubber   = { Friction = 0.60, Bounce = 0.80 },
-    SpeedRail= { Friction = 0.01, Bounce = 0.10, SpeedBoost = 1.5 },
-    Water    = nil,  -- triggers hazard reset, no physics
-    Lava     = nil,  -- triggers hazard reset (volcano theme), no physics
+  Poise = {
+    StaggerThreshold  = 100,
+    PoiseDecayPerSec  = 5,     -- poise bar drains if not hit
+  },
+  ChiMeter = {
+    Max               = 100,
+    GainPerHitDealt   = 4,
+    GainPerHitTaken   = 6,
   },
 }
 ```
 
-### 12.3 MonetizationConfig.lua (example shape)
+### 14.3 EnemyConfig.lua (example shape)
+
+```lua
+return {
+  ConcurrentAttackerCap = 3,
+  AggroRadius            = 24,   -- studs
+  AttackTelegraph        = 0.4,  -- seconds windup before hit
+  Roles = {
+    Grunt    = { Health = 40,  Damage = 6,  Poise = 20 },
+    Soldier  = { Health = 60,  Damage = 8,  Poise = 40, Blocks = true },
+    Heavy    = { Health = 120, Damage = 16, Poise = 90 },
+    Ranged   = { Health = 35,  Damage = 10, Poise = 15, AttackRange = 30 },
+    Assassin = { Health = 30,  Damage = 9,  Poise = 15, MoveSpeedMult = 1.4 },
+    Elite    = { Health = 300, Damage = 18, Poise = 200, UltimateAttack = true },
+  },
+}
+```
+
+### 14.4 LootConfig.lua (example shape)
+
+```lua
+return {
+  Containers = {
+    WoodenCrate = { Hits = 1, DropTable = "Common" },
+    ClayUrn     = { Hits = 1, DropTable = "Common" },
+    SupplyBarrel= { Hits = 2, DropTable = "Uncommon" },
+    JadeChest   = { Hits = 3, DropTable = "Rare", Hidden = true },
+  },
+  ChestRarityWeights = {
+    Arena   = { Common = 60, Uncommon = 25, Rare = 10, Epic = 4, Legendary = 1 },
+    Chapter = { Common = 40, Uncommon = 30, Rare = 18, Epic = 9, Legendary = 3 },
+    Boss    = { Common = 20, Uncommon = 30, Rare = 28, Epic = 16, Legendary = 6 },
+    Vault   = { Common = 10, Uncommon = 25, Rare = 30, Epic = 25, Legendary = 10 },
+  },
+}
+```
+
+### 14.5 MonetizationConfig.lua (example shape)
 
 ```lua
 return {
   GamePasses = {
-    VIPPassId       = 0,  -- fill before launch
-    BattlePassId    = 0,
+    VIPPassId    = 0,  -- fill before launch
+    BattlePassId = 0,
   },
-  GemProducts = {
-    { ProductId = 0, Gems = 100,  Robux = 80  },
-    { ProductId = 0, Gems = 550,  Robux = 400 },
-    { ProductId = 0, Gems = 1200, Robux = 800 },
+  JadeProducts = {
+    { ProductId = 0, Jade = 100,  Robux = 80  },
+    { ProductId = 0, Jade = 550,  Robux = 400 },
+    { ProductId = 0, Jade = 1200, Robux = 800 },
   },
-  CoinToGemRate = nil,   -- coins NOT convertible to gems (one-way economy)
-  VIPBoostXP    = 0.25,  -- 25% bonus
-  VIPBoostCoins = 0.25,
+  CoinToJadeRate = nil,  -- Coins NOT convertible to Jade (one-way economy)
+  VIPBoostXP     = 0.25,
+  VIPBoostCoins  = 0.25,
 }
 ```
 
-### 12.4 ChaosConfig.lua (example shape)
-
-```lua
-return {
-  MaxActiveModifiers = 2,
-  ChaosRewardBonus   = 0.10,  -- 10% extra coins/XP when modifier active all round
-  Modifiers = {
-    LowGravity    = { GravityScale = 0.3, AirTimeMultiplier = 3.0 },
-    SlipperyWorld = { GlobalFrictionOverride = 0.02 },
-    GiantFans     = { FanCount = 3, FanForce = 40, RandomPlacement = true },
-    TinyBall      = { SizeScale = 0.5, SpeedMultiplier = 1.2 },
-    BigBall       = { SizeScale = 2.0, KnocksObstacles = true },
-    RandomWind    = { GustInterval = 5, GustForce = 25, RandomDirection = true },
-  },
-}
-```
-
-### 12.5 AudioConfig.lua (example shape)
-
-```lua
-return {
-  SFX = {
-    Swing       = { Id = 0, Volume = 0.8, PitchRange = { 0.9, 1.1 } },
-    ImpactGrass = { Id = 0, Volume = 0.7 },
-    ImpactHard  = { Id = 0, Volume = 0.8 },
-    BallInHole  = { Id = 0, Volume = 1.0 },
-    HoleInOne   = { Id = 0, Volume = 1.0 },
-    Splash      = { Id = 0, Volume = 0.9 },
-    LipOut      = { Id = 0, Volume = 0.8 },
-    TrickShot   = { Id = 0, Volume = 0.9 },
-    UIClick     = { Id = 0, Volume = 0.5 },
-    PowerFull   = { Id = 0, Volume = 0.6 },
-  },
-  Music = {
-    -- one entry per theme
-    Forest      = { Id = 0, Volume = 0.4, Looped = true },
-    Tropical    = { Id = 0, Volume = 0.4, Looped = true },
-    Haunted     = { Id = 0, Volume = 0.3, Looped = true },
-    Snowy       = { Id = 0, Volume = 0.4, Looped = true },
-    SkyIsland   = { Id = 0, Volume = 0.4, Looped = true },
-    Volcano     = { Id = 0, Volume = 0.4, Looped = true },
-    Castle      = { Id = 0, Volume = 0.4, Looped = true },
-    Neon        = { Id = 0, Volume = 0.45, Looped = true },
-    Night       = { Id = 0, Volume = 0.35, Looped = true },
-    Lobby       = { Id = 0, Volume = 0.3, Looped = true },
-  },
-}
-```
-
-### 12.6 Config Access Pattern
-
-Scripts import config via a central accessor, not by requiring individual files scattered across scripts:
+### 14.6 Config Access Pattern
 
 ```lua
 -- src/shared/ConfigService.lua
 local Config = {
-  Ball         = require(script.Parent.config.BallConfig),
-  Course       = require(script.Parent.config.CourseConfig),
-  Obstacle     = require(script.Parent.config.ObstacleConfig),
-  Chaos        = require(script.Parent.config.ChaosConfig),
-  Shop         = require(script.Parent.config.ShopConfig),
+  Combat       = require(script.Parent.config.CombatConfig),
+  Weapon       = require(script.Parent.config.WeaponConfig),
+  Enemy        = require(script.Parent.config.EnemyConfig),
+  Chapter      = require(script.Parent.config.ChapterConfig),
+  Loot         = require(script.Parent.config.LootConfig),
+  Accessory    = require(script.Parent.config.AccessoryConfig),
   Progression  = require(script.Parent.config.ProgressionConfig),
-  Audio        = require(script.Parent.config.AudioConfig),
+  Shop         = require(script.Parent.config.ShopConfig),
   Monetization = require(script.Parent.config.MonetizationConfig),
+  Audio        = require(script.Parent.config.AudioConfig),
   UI           = require(script.Parent.config.UIConfig),
   Localization = require(script.Parent.config.LocalizationConfig),
-  TrickShot    = require(script.Parent.config.TrickShotConfig),
 }
 return Config
 ```
 
 ---
 
-## 13. UI/UX
+## 15. UI/UX
 
-### 13.1 HUD (in-round)
+### 15.1 HUD (in-battlefield)
 
 ```
 ┌──────────────────────────────────────────────────────┐
-│  [Hole 3/9]  Par 3   Strokes: 2        [Scoreboard]  │
+│ [Chapter 3 · Bamboo Forest]      Combo: 24    [Party] │
+│ ▓▓▓▓▓▓▓░░░ HP     ▓▓▓▓░░░░░░ Chi                      │
 │                                                        │
-│                  [3D course view]                      │
+│                  [3D battlefield view]                 │
 │                                                        │
-│  [Aim zone (drag here)]      [Power Btn]  [Spin BTN]  │
-│  [Mini leaderboard]                     [Emote BTN]   │
+│  [Move stick]        [Grab] [Attack] [Heavy] [Ult]    │
 └──────────────────────────────────────────────────────┘
 ```
 
-- HUD collapses non-essential elements during shot (clean focus)
-- Power bar vertical on mobile, horizontal on PC
-- Score delta shown immediately after sink (–1 Birdie, HIO!, +1 Bogey)
-- Trick shot overlay appears for 2s then fades
+- HUD stays minimal outside combat, expands (combo counter, party HP bars) once an arena gate seals
+- Party frames show teammate HP/Chi and "Fallen — needs revive" status
+- Combo counter pulses and scales up briefly on milestone thresholds
+- Style Score / reward multiplier shown at arena-clear summary, not mid-fight (keeps combat screen clean)
 
-### 13.2 Menus
+### 15.2 Responsive UI
 
-Flow: Lobby → Course Select → Mode Select → Chaos Modifier (optional) → Ready → Load
+- All layouts built on Roblox `UIAspectRatioConstraint` / anchor-point scaling — no fixed pixel positions
+- Safe-area insets respected on notched mobile devices
+- HUD reflows for three breakpoints: desktop widescreen, tablet/landscape mobile, portrait mobile (combat controls shift to bottom-corner thumb zones)
+- Text and icon sizes scale via `UIConfig.lua` breakpoint table, never hardcoded per-screen
+- Menus tested at ultrawide and narrow portrait extremes before release
+
+### 15.3 Menus
+
+Flow: Lobby → Chapter Select → Party Setup (solo/co-op) → Loadout Check (weapon/Ultimate/accessories) → Ready → Load
 
 - All menus have back navigation (no dead ends)
-- Settings: Audio volume (music/SFX separate), Control scheme, Graphics quality, Aim Assist toggle, Language
+- Settings: Audio volume (music/SFX separate), control scheme, graphics quality, lock-on assist toggle, language
 
-### 13.3 Feedback Principles
+### 15.4 Feedback Principles
 
-- Every shot: visual (trail, impact particle) + audio (swing whoosh, surface-specific impact)
-- Hole-in-one: full-screen celebration, server announcement banner, fireworks
-- Lip-out: slow-mo camera + distinct "clank" audio + crowd "ooh"
-- Near-miss: subtle red flash on hole rim
-- Trick shot: overlay + distinct sound played for all spectators
-- Shortcut found: local discovery animation (doesn't announce to others)
+- Every hit: visual (impact particle, hit-stop frame) + audio (weapon-specific impact sound)
+- Finishing Move: brief slow-mo + distinct light-burst + unique sound, visible to whole party
+- Flawless arena clear: banner + distinct fanfare
+- Boss phase transition: screen flash + tone shift in music
+- Container break: satisfying crunch/shatter sound + item pop animation toward HUD currency counter
 
 ---
 
-## 14. Audio
+## 16. Audio
 
 All sound asset IDs live in `AudioConfig.lua`. No IDs anywhere else in code.
 
 | Event | Sound |
 |---|---|
-| Club swing | Whoosh, pitch varies with power |
-| Ball impact grass | Soft thud |
-| Ball impact hard surface | Sharp click |
-| Ball impact ice | High-pitched slide |
-| Ball in hole | Plunk + crowd cheer |
-| Hole-in-one | Full fanfare |
-| Lip-out | Metallic clank |
-| Trick shot | Crowd "ooh" + whoosh |
-| Water/lava hazard | Splash / sizzle |
-| Shortcut found | Discovery chime |
-| Chaos modifier activated | Comedic event sound |
+| Light attack | Quick whoosh/strike, pitch varies per weapon |
+| Heavy attack | Heavier impact thud/clang |
+| Block / Parry | Metallic clash; perfect parry has a distinct "chime" variant |
+| Dodge roll | Cloth whoosh |
+| Finishing Move | Light-dissolve chime + brief musical sting |
+| Container break | Wood crack / clay shatter / chest unlock jingle |
+| Enemy hit / death | Per-role grunt/impact set |
+| Boss phase transition | Musical tone shift + roar/impact |
+| Ultimate activation | Weapon-specific charged release sound |
+| Chi meter full | Tension sting |
+| Chapter complete | Victory fanfare |
 | UI click | Soft tap |
-| Power bar at full | Tension sting |
-| Background music | Per-theme loop |
-| Ambient sounds | Per-theme (birds, wind, lava rumble, ocean) |
+| Background music | Per-chapter combat + exploration loop pair |
+| Ambient sounds | Per-chapter (temple wind, village fire crackle, forest rustle, cave drips) |
 
 - Music and SFX volumes independently adjustable in Settings
-- No audio autoplays on Roblox game page (follows Roblox audio policy)
+- Combat music intensifies when an arena gate seals (layered stem swap), returns to exploration theme after clear
+- No audio autoplays on the Roblox game page (follows Roblox audio policy)
 
 ---
 
-## 15. Technical Notes
+## 17. Technical Notes
 
-### 15.1 Architecture
+### 17.1 Architecture
 
-- **Client:** Rendering, input handling, local UI, camera, ball trail FX, ghost replay
-- **Server:** Authoritative physics result, score validation, anti-cheat, DataStore writes
+- **Client:** Rendering, input handling, local UI, camera, hit-stop/impact FX, HUD
+- **Server:** Authoritative hit detection, damage resolution, drop rolls, DataStore writes, anti-cheat
 - **Shared:** Config (via ConfigService), utility modules, types
 
-Shot fired client-side for responsiveness → server validates final position → reconcile if delta exceeds threshold.
+Attacks register client-side for responsiveness → server validates hit registration and damage → reconcile if delta exceeds threshold.
 
-### 15.2 Anti-Cheat
+**Combat netcode approach (higher stakes than a physics-only game — hit timing must feel fair to all 4 players):**
+- Each client runs local hit detection for instant attack feedback (swing animation, hit-stop, impact FX play immediately, no wait for server)
+- Server re-runs the swing against its own enemy positions with a small lag-compensation window (rewind enemy hitboxes to the attacker's timestamp, standard favor-the-attacker model) before committing damage
+- If server rejects a hit the client thought landed, the impact FX is silently retracted next frame (no rubber-banding — enemy just didn't take damage, no position snap)
+- Enemy AI state and movement are server-owned and replicated down, not client-simulated, so all 4 players see the same enemy behavior
+- Combat netcode is flagged as the highest-risk technical system in this GDD — prototype and load-test a single arena at full 4-player co-op before building out further chapters
 
-- Server owns all score writes; client cannot increment scores
-- Shot power capped server-side (`BallConfig.Physics.MaxPowerVelocity`)
-- Stroke count validated per hole server-side
-- Trick shot bonuses validated server-side (surface contact log, not client assertion)
+### 17.2 Anti-Cheat
 
-### 15.3 Data Persistence
+- Server owns all damage, currency, and XP writes; client cannot increment any of them directly
+- Attack damage and cooldowns capped/validated server-side against `CombatConfig.lua`
+- Drop rolls resolved server-side against `LootConfig.lua`, never client-asserted
+- Concurrent attacker cap and enemy AI state are server-authoritative to prevent client-side enemy manipulation
 
-- `DataStoreService` stores: level, XP, coins, gems, inventory, quest progress, course bests, shortcuts found, streak
-- Auto-save on round end and lobby return
+### 17.3 Data Persistence
+
+- `DataStoreService` stores: level, XP, Coins, Jade Shards, inventory (accessories/weapon skins), skill tree allocation, chapter progress, quest progress, mastery stars, streak
+- Auto-save on chapter completion and lobby return
 - Retry with exponential backoff on DataStore failure; backup store on second failure
 
-### 15.4 Performance Targets
+### 17.4 Performance Targets
 
 | Platform | Target FPS | Notes |
 |---|---|---|
 | PC | 60 | Full particles, shadows |
-| Mobile | 30+ | Reduced trail particle count (via `UIConfig`), simplified shadows |
+| Mobile | 30+ | Reduced hit-particle count (via `UIConfig`), simplified shadows |
 | Console | 60 | Full particles, dynamic resolution allowed |
 
-- LOD system for course props at distance
-- Ball trail particle limit in `UIConfig.lua` per quality tier
-- Max 8 players; physics complexity bounded by design
-- Course loads via Roblox streaming (not full upfront load)
+- LOD system for battlefield props at distance
+- Enemy count and particle limits bounded per `EnemyConfig.lua` / `UIConfig.lua` per quality tier
+- Max 4 players per battlefield instance; enemy AI complexity bounded by design
+- Chapters load via Roblox streaming (not full upfront load)
 
-### 15.5 Ghost Replay Storage
+### 17.5 Wave & Drop Determinism
 
-- Ghost data = array of timestamped `{Position, Velocity}` snapshots at 20Hz
-- Top 3 per course stored in DataStore; personal best always stored
-- Playback interpolates between snapshots; no full physics re-sim
+- Enemy wave compositions and drop rolls use a server-seeded RNG per instance, logged for anti-cheat auditing
+- Daily Relic Hunt modifiers use a shared daily seed so all players get the same remix that day
+
+### 17.6 Pre-Launch Checklist
+
+Open items that must close before ship, tracked here so they don't silently slip:
+
+| Item | Risk if skipped | Owner action |
+|---|---|---|
+| All `0`-placeholder GamePass/Product/Asset IDs in configs | Purchases fail silently, zero revenue | Fill every ID in `MonetizationConfig.lua` / `AudioConfig.lua` and test each purchase flow in Studio before release |
+| Weapon DPS balance pass | "Balanced by design" (§5.2) is a target, not a measured fact | Run combat logging across all 5 weapons vs. standard wave compositions; tune `WeaponConfig.lua` off real numbers, not intent |
+| Finishing Move / violence content re-check | Roblox content policy shifts over time | Re-review the light-dissolve Finishing Move effect against current Roblox community guidelines shortly before launch, not just at design time |
+| IP naming audit | Trademark/likeness risk | Confirm no character, faction, or location name (Nezhar, Jade Serpent Clan, etc.) collides with existing MK or other IP before marketing materials go out |
+| 4-player combat load test | Netcode approach (§17.1) unproven at scale | Run a full arena at 4 concurrent players before greenlighting additional chapters |
 
 ---
 
-## 16. Nuance & Feel
+## 18. Nuance & Feel
 
 Small details that separate "feels great" from "just works":
 
-- **Power bar tempo:** Non-linear speed — precision zone in middle, forgiving at extremes — feels intentional, not random
-- **Hole magnet:** 0.5-stud radius only, so hole-in-ones feel earned, not magnetized in
-- **Camera lag:** 0.1s lerp follow delay makes ball movement feel weighty and real
-- **Spin visibility:** Ball visibly rotates in direction of applied spin during flight
-- **Lip-out slow-mo:** Ball circling hole rim triggers brief slow-mo + unique audio — cinematic, memorable
-- **Simultaneous shots:** All players shoot same turn; no waiting around watching others; more energy
-- **Failure tone:** Over-par finish has no harsh punishment sound or red screen; keeps mood light
-- **Hole preview:** 3s flyover camera on first visit to hole; skippable; on revisit auto-skipped
-- **Shortcut discovery:** Silent local notification (no announcement to server) — respects the hunt
-- **Obstacle telemetry:** Moving obstacles have slight anticipatory animation cues (windmill arm flash) so timing isn't pure memorization
-- **Spectator reactions:** Floating emoji reactions appear above players and over ball on impact — lobby energy stays high even while watching
-- **Chaos modifier intro:** 3-second countdown + "CHAOS ACTIVATED: Low Gravity" screen on modifier activation
-- **Victory screen:** Shows stroke-by-stroke replay of player's lowest-score hole; shareable screenshot frame via Roblox screenshot API
-- **Lobby putting green:** Playable; sinking putts in lobby earns small coin trickle; keeps players engaged while waiting
+- **Hit-stop:** Brief freeze-frame (~0.05–0.08s) on Heavy Attack and Finishing Move impacts sells weight
+- **Camera punch-in:** Subtle zoom on boss phase transitions and Finishing Moves for cinematic emphasis
+- **Ring behavior:** Non-attacking enemies visibly circle rather than idle — keeps crowds feeling alive, not decorative
+- **Telegraph flash:** Attack windup has a brief material glow so reads are learnable, not memorized
+- **Container feedback:** Items visibly pop and arc toward the player before flying to the HUD counter — feels earned, not just numbers ticking
+- **Combo drop grace:** Short grace window before combo counter resets, so a stray dodge doesn't feel punishing
+- **Revive urgency:** Fallen-teammate icon pulses and grows more urgent the longer they're down, without being anxiety-inducing
+- **Boss defeat weight:** Slow-mo final blow + brief silence before victory fanfare hits — a breath before the payoff
+- **Lobby training dummies:** Freely punchable; light XP-free combo practice keeps players warmed up between chapters
+- **Style Score reveal:** Shown as a satisfying tally-up animation on the arena-clear screen, not a flat number dump
 
 ---
 
-## 17. Out of Scope (v1)
+## 19. Out of Scope (v1)
 
 Deferred to prevent scope creep:
 
-- Course creator / user-generated levels
-- ELO / ranked matchmaking
+- PvP arena mode
+- Chapter/level editor or user-generated content
 - Clan / guild system
 - Real-money auction house for cosmetics
 - Voice chat integration
 - Replay export to video
 - Arabic / Hebrew RTL layout
-- Spectator betting / prediction mini-game
+- Ranked matchmaking / ELO
 - Mobile AR mode
+- Graphic gore/violence beyond stylized light-dissolve effects (policy constraint, not just scope)
 
 ---
 
-*Document maintained by: M. Iqbal Effendi*  
-*Last updated: 2026-05-24*
+*Document maintained by: M. Iqbal Effendi*
+*Last updated: 2026-08-14*
