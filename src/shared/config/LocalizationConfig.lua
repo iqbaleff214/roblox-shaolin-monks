@@ -26,4 +26,20 @@ return {
 		ru = "en",
 		["zh-CN"] = "en",
 	},
+
+	-- T-152 (§13.2): decimal/thousands separator convention per locale. A
+	-- deliberate simplification of real CLDR locale data (e.g. French's
+	-- traditional narrow-no-break-space grouping, or CJK myriad grouping)
+	-- for a launch-scope engineering task — real per-locale nuance is
+	-- localization-content work, not something this formatter invents.
+	NumberFormat = {
+		en = { ThousandsSeparator = ",", DecimalSeparator = "." },
+		["zh-CN"] = { ThousandsSeparator = ",", DecimalSeparator = "." },
+		id = { ThousandsSeparator = ".", DecimalSeparator = "," },
+		es = { ThousandsSeparator = ".", DecimalSeparator = "," },
+		["pt-BR"] = { ThousandsSeparator = ".", DecimalSeparator = "," },
+		fr = { ThousandsSeparator = ".", DecimalSeparator = "," },
+		de = { ThousandsSeparator = ".", DecimalSeparator = "," },
+		ru = { ThousandsSeparator = ".", DecimalSeparator = "," },
+	},
 }

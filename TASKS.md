@@ -602,21 +602,21 @@ Each config module is pure data (no side effects), matching the example shapes i
 **Description:** Wraps `LocalizationService:GetTranslator()` with the fallback chain from `LocalizationConfig` (§13.2).
 **DoD / Expected Output:** Any missing translation key falls back to `en` rather than displaying a raw key string to the player.
 **Test Case:** Integration test: request a key that only exists in `en`, from a client set to another locale, assert the `en` string is returned (not the key name).
-- [ ] Done
+- [x] Done
 
 #### T-151 — Hardcoded-string lint / audit tool
 **Depends on:** T-150
 **Description:** CI-style script scanning UI/gameplay source for string literals rendered to players that don't route through the translator (§13.2's "no hardcoded strings" rule).
 **DoD / Expected Output:** Produces a report of violations; zero violations required before Phase 18 sign-off.
 **Test Case:** Run the lint against a deliberately-seeded hardcoded string, assert it's flagged.
-- [ ] Done
+- [x] Done
 
 #### T-152 — Locale-aware numeric/date formatting utility
 **Depends on:** T-021
 **Description:** Formats large numbers (currency, Style Score) and dates per locale (decimal/thousands separators, local timezone, §13.2).
 **DoD / Expected Output:** Same underlying value renders differently for at least two locales with different separator conventions (e.g. `1,000` vs `1.000`) in a side-by-side test.
 **Test Case:** TestEZ spec: format `1234567` under two different locale configs, assert expected separator output for each.
-- [ ] Done
+- [x] Done
 
 ---
 

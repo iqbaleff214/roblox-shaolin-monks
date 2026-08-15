@@ -43,7 +43,12 @@ local function spawnPickupItem(position: Vector3): BasePart
 	CollectionService:AddTag(part, PICKUP_TAG)
 
 	local prompt = Instance.new("ProximityPrompt")
-	prompt.ActionText = "Pick Up Weapon"
+	-- T-151/§13.2: server-set ProximityPrompt text replicates identically to
+	-- every client, so it can't route through the client-only translator
+	-- (LocalizationController) the way UI scripts do — true per-player
+	-- localization of it needs a client-side override system, out of scope
+	-- here. Deliberate, explicit lint exemption, not an oversight.
+	prompt.ActionText = "Pick Up Weapon" -- lint-disable
 	prompt.HoldDuration = 0
 	prompt.MaxActivationDistance = PICKUP_RANGE
 	prompt.Parent = part

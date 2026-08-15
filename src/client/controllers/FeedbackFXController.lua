@@ -89,26 +89,40 @@ local function applyHitStop()
 	end)
 end
 
+-- T-150/§13.2: container type -> its translated display-name key, so the
+-- break popup never shows a raw internal id like "WoodenCrate" to players.
+local CONTAINER_NAME_KEYS: { [string]: string } = {
+	WoodenCrate = "container.name.woodencrate",
+	ClayUrn = "container.name.clayurn",
+	SupplyBarrel = "container.name.supplybarrel",
+	JadeChest = "container.name.jadechest",
+}
+
 function FeedbackFXController:KnitStart()
 	buildPlaceholderOverlay()
+
+	local LocalizationController = Knit.GetController("LocalizationController")
 
 	local FeedbackFXService = Knit.GetService("FeedbackFXService")
 	FeedbackFXService.HitStop:Connect(function(_target: Model)
 		applyHitStop()
 	end)
 	FeedbackFXService.FinishingMoveOverlay:Connect(function(_target: Model)
-		showMessage("FINISHING MOVE", Timings.FinishingMoveOverlayDuration)
+		showMessage(LocalizationController:Translate("fx.message.finishingmove"), Timings.FinishingMoveOverlayDuration)
 	end)
 	FeedbackFXService.BossPhaseFlash:Connect(function(_target: Model)
 		flash(Timings.BossPhaseFlashDuration)
 	end)
 	FeedbackFXService.ContainerBreakPopup:Connect(function(containerType: string)
-		showMessage(containerType .. " broken!", Timings.ContainerPopupDuration)
+		local nameKey = CONTAINER_NAME_KEYS[containerType]
+		local displayName = if nameKey then LocalizationController:Translate(nameKey) else containerType
+		local message = displayName .. " " .. LocalizationController:Translate("fx.message.containerbroken")
+		showMessage(message, Timings.ContainerPopupDuration)
 	end)
 
 	local SocialHookService = Knit.GetService("SocialHookService")
 	SocialHookService.FlawlessBanner:Connect(function()
-		showMessage("FLAWLESS!", Timings.FlawlessBannerDuration)
+		showMessage(LocalizationController:Translate("fx.message.flawless"), Timings.FlawlessBannerDuration)
 	end)
 end
 

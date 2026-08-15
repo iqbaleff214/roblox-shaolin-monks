@@ -126,19 +126,21 @@ local function buildControls()
 	gui.IgnoreGuiInset = true
 	gui.Enabled = false
 
-	local attackButton = makeButton(gui, "AttackButton", UDim2.new(1, -20, 1, -20), Vector2.new(1, 1), UIConfig.Colors.Primary, "Attack")
+	local LocalizationController = Knit.GetController("LocalizationController")
+
+	local attackButton = makeButton(gui, "AttackButton", UDim2.new(1, -20, 1, -20), Vector2.new(1, 1), UIConfig.Colors.Primary, LocalizationController:Translate("mobile.button.attack"))
 	bindAttackButton(attackButton)
 
-	local ultimateButton = makeButton(gui, "UltimateButton", UDim2.new(1, -20, 1, -20 - BUTTON_SIZE - 16), Vector2.new(1, 1), UIConfig.Colors.Secondary, "Ult")
+	local ultimateButton = makeButton(gui, "UltimateButton", UDim2.new(1, -20, 1, -20 - BUTTON_SIZE - 16), Vector2.new(1, 1), UIConfig.Colors.Secondary, LocalizationController:Translate("mobile.button.ultimate"))
 	bindTapButton(ultimateButton, "Ultimate")
 
-	local grabButton = makeButton(gui, "GrabButton", UDim2.new(1, -20 - BUTTON_SIZE - 16, 1, -20), Vector2.new(1, 1), UIConfig.Colors.TextMuted, "Grab")
+	local grabButton = makeButton(gui, "GrabButton", UDim2.new(1, -20 - BUTTON_SIZE - 16, 1, -20), Vector2.new(1, 1), UIConfig.Colors.TextMuted, LocalizationController:Translate("mobile.button.grab"))
 	bindTapButton(grabButton, "Grab")
 
-	local dodgeButton = makeButton(gui, "DodgeButton", UDim2.new(1, -20 - BUTTON_SIZE - 16, 1, -20 - BUTTON_SIZE - 16), Vector2.new(1, 1), UIConfig.Colors.TextMuted, "Dodge")
+	local dodgeButton = makeButton(gui, "DodgeButton", UDim2.new(1, -20 - BUTTON_SIZE - 16, 1, -20 - BUTTON_SIZE - 16), Vector2.new(1, 1), UIConfig.Colors.TextMuted, LocalizationController:Translate("mobile.button.dodge"))
 	bindTapButton(dodgeButton, "Dodge")
 
-	local shieldButton = makeButton(gui, "ShieldButton", UDim2.new(1, -20 - (BUTTON_SIZE + 16) * 2, 1, -20), Vector2.new(1, 1), UIConfig.Colors.Success, "Shield")
+	local shieldButton = makeButton(gui, "ShieldButton", UDim2.new(1, -20 - (BUTTON_SIZE + 16) * 2, 1, -20), Vector2.new(1, 1), UIConfig.Colors.Success, LocalizationController:Translate("mobile.button.shield"))
 	bindHoldButton(shieldButton, "Block")
 
 	gui.Parent = player:WaitForChild("PlayerGui")

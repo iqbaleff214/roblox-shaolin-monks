@@ -18,6 +18,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Knit = require(ReplicatedStorage.Packages.Knit)
 local ConfigService = require(ReplicatedStorage.Shared.ConfigService)
+local LocaleFormat = require(ReplicatedStorage.Shared.modules.LocaleFormat)
 
 local UIConfig = ConfigService.UI
 local CombatConfig = ConfigService.Combat
@@ -147,9 +148,16 @@ function CombatHUDController:KnitStart()
 	local CombatService = Knit.GetService("CombatService")
 	CombatService.Chi:Observe(updateChi)
 
+	local LocalizationController = Knit.GetController("LocalizationController")
 	local CombatController = Knit.GetController("CombatController")
 	CombatController.ComboUpdated:Connect(function(comboCount: number)
-		comboLabel.Text = if comboCount > 0 then `Combo: {comboCount}` else ""
+		if comboCount > 0 then
+			local label = LocalizationController:Translate("hud.label.combo")
+			local locale = LocalizationController:GetLocale()
+			comboLabel.Text = `{label}: {LocaleFormat.formatNumber(comboCount, locale)}`
+		else
+			comboLabel.Text = ""
+		end
 	end)
 
 	local ArenaGateController = Knit.GetService("ArenaGateController")

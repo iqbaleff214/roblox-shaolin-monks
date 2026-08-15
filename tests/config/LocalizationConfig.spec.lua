@@ -35,5 +35,15 @@ return function()
 				end
 			end
 		end)
+
+		it("should define a NumberFormat entry for every supported locale (T-152)", function()
+			for _, locale in LocalizationConfig.SupportedLocales do
+				local format = LocalizationConfig.NumberFormat[locale]
+				expect(format).to.be.a("table")
+				expect(type(format.ThousandsSeparator)).to.equal("string")
+				expect(type(format.DecimalSeparator)).to.equal("string")
+				expect(format.ThousandsSeparator).never.to.equal(format.DecimalSeparator)
+			end
+		end)
 	end)
 end

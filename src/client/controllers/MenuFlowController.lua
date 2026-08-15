@@ -26,6 +26,17 @@ MenuFlowController.StateChanged = Signal.new() -- (state: string)
 local stateMachine = MenuFlowStateMachine.new()
 local framesByState: { [string]: Frame } = {}
 
+-- T-150/§13.2: every screen title routes through the translator — no
+-- hardcoded player-facing string (T-151 lints for exactly this).
+local STATE_TITLE_KEYS: { [string]: string } = {
+	Lobby = "ui.screen.lobby",
+	ChapterSelect = "ui.screen.chapterselect",
+	PartySetup = "ui.screen.partysetup",
+	LoadoutCheck = "ui.screen.loadoutcheck",
+	Ready = "ui.screen.ready",
+	Load = "ui.screen.load",
+}
+
 local function showCurrentState()
 	local current = stateMachine:current()
 	for state, frame in framesByState do
@@ -49,7 +60,8 @@ local function buildScreen(gui: ScreenGui, state: string)
 	title.TextColor3 = UIConfig.Colors.Text
 	title.TextScaled = true
 	title.Font = Enum.Font.GothamBold
-	title.Text = state
+	local LocalizationController = Knit.GetController("LocalizationController")
+	title.Text = LocalizationController:Translate(STATE_TITLE_KEYS[state] or state)
 	title.Parent = frame
 
 	if state ~= "Lobby" then
@@ -61,7 +73,7 @@ local function buildScreen(gui: ScreenGui, state: string)
 		backButton.TextColor3 = UIConfig.Colors.Background
 		backButton.TextScaled = true
 		backButton.Font = Enum.Font.GothamBold
-		backButton.Text = "Back"
+		backButton.Text = LocalizationController:Translate("ui.button.back")
 		backButton.Parent = frame
 
 		backButton.Activated:Connect(function()
@@ -82,7 +94,7 @@ local function buildScreen(gui: ScreenGui, state: string)
 		nextButton.TextColor3 = UIConfig.Colors.Text
 		nextButton.TextScaled = true
 		nextButton.Font = Enum.Font.GothamBold
-		nextButton.Text = "Next"
+		nextButton.Text = LocalizationController:Translate("ui.button.next")
 		nextButton.Parent = frame
 
 		nextButton.Activated:Connect(function()
