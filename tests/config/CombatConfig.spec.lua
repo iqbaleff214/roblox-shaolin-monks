@@ -6,9 +6,12 @@ local CombatConfig = require(ReplicatedStorage.Shared.config.CombatConfig)
 -- (e.g. "ParryWindow" -> "ParyWindow") fails loudly instead of silently
 -- reading nil at runtime.
 local EXPECTED_SHAPE = {
-	Attacks = { "LightDamage", "HeavyDamage", "ComboWindow", "ParryWindow", "DodgeIFrames", "DodgeCooldown" },
+	Attacks = { "LightDamage", "HeavyDamage", "ComboWindow", "ParryWindow", "DodgeIFrames", "DodgeCooldown", "BlockDamageReduction" },
 	Poise = { "StaggerThreshold", "PoiseDecayPerSec" },
 	ChiMeter = { "Max", "GainPerHitDealt", "GainPerHitTaken" },
+	Disarm = { "ChanceOnHeavyVsBlocking", "VulnerableDuration" },
+	Grapple = { "ThrowDamage", "HumanShieldHitCapacity" },
+	WeaponPickup = { "ThrowDamage", "MeleeDamage", "MeleeSwings" },
 }
 
 -- §3.1 Movement is nested (sub-tables per mechanic), so it's checked
@@ -28,7 +31,7 @@ end
 
 return function()
 	describe("CombatConfig", function()
-		it("should expose exactly Attacks, Poise, ChiMeter, and Movement", function()
+		it("should expose exactly Attacks, Poise, ChiMeter, Movement, Disarm, Grapple, and WeaponPickup", function()
 			local seen = {}
 			for key in CombatConfig do
 				seen[key] = true
@@ -37,12 +40,15 @@ return function()
 			expect(seen.Poise).to.equal(true)
 			expect(seen.ChiMeter).to.equal(true)
 			expect(seen.Movement).to.equal(true)
+			expect(seen.Disarm).to.equal(true)
+			expect(seen.Grapple).to.equal(true)
+			expect(seen.WeaponPickup).to.equal(true)
 
 			local count = 0
 			for _ in CombatConfig do
 				count += 1
 			end
-			expect(count).to.equal(4)
+			expect(count).to.equal(7)
 		end)
 
 		it("should match the exact field set for each subtable (typo/rename guard)", function()
@@ -65,6 +71,16 @@ return function()
 			expect(CombatConfig.Attacks.HeavyDamage > 0).to.equal(true)
 			expect(CombatConfig.Poise.StaggerThreshold > 0).to.equal(true)
 			expect(CombatConfig.ChiMeter.Max > 0).to.equal(true)
+		end)
+
+		it("should keep the disarm chance a valid probability (§3.5)", function()
+			expect(CombatConfig.Disarm.ChanceOnHeavyVsBlocking >= 0).to.equal(true)
+			expect(CombatConfig.Disarm.ChanceOnHeavyVsBlocking <= 1).to.equal(true)
+		end)
+
+		it("should keep block damage reduction a valid fraction (§3.3)", function()
+			expect(CombatConfig.Attacks.BlockDamageReduction >= 0).to.equal(true)
+			expect(CombatConfig.Attacks.BlockDamageReduction <= 1).to.equal(true)
 		end)
 
 		it("should match the exact top-level field set for Movement (typo/rename guard)", function()

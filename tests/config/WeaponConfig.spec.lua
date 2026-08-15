@@ -53,6 +53,16 @@ return function()
 			end
 		end)
 
+		it("should give every weapon a positive melee Range and Arc for hit detection (T-042)", function()
+			for _, weapon in WeaponConfig.Weapons do
+				expect(weapon.Range).to.be.a("number")
+				expect(weapon.Range > 0).to.equal(true)
+				expect(weapon.Arc).to.be.a("number")
+				expect(weapon.Arc > 0).to.equal(true)
+				expect(weapon.Arc <= 360).to.equal(true)
+			end
+		end)
+
 		it("should keep theoretical DPS within ±5% across all 5 weapons at default combo efficiency", function()
 			local dpsValues = {}
 			local sum = 0

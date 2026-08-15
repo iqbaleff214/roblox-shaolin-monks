@@ -10,6 +10,7 @@ return {
 		ParryWindow = 0.15, -- seconds before impact for a perfect parry
 		DodgeIFrames = 0.2, -- seconds of invulnerability during a dodge roll
 		DodgeCooldown = 0.8,
+		BlockDamageReduction = 0.6, -- §3.3: fraction of incoming damage a normal (non-perfect) block absorbs
 	},
 	Poise = {
 		StaggerThreshold = 100,
@@ -48,5 +49,27 @@ return {
 		DodgeRoll = {
 			Distance = 10, -- studs covered by a single dodge roll
 		},
+	},
+
+	-- §3.5: Heavy Attack vs. a blocking enemy has a chance to disarm them.
+	Disarm = {
+		ChanceOnHeavyVsBlocking = 0.5,
+		VulnerableDuration = 1.5, -- seconds the enemy stays weapon-less/blockless after disarm
+	},
+
+	-- §3.4: grab a staggered enemy, throw them into another enemy/hazard, or
+	-- hold them as a human shield.
+	Grapple = {
+		ThrowDamage = 25, -- damage dealt to an enemy struck by a thrown enemy
+		HumanShieldHitCapacity = 2, -- ranged hits absorbed before the shield drops
+	},
+
+	-- §3.5: pickup weapons (disarmed or environmental) are temporary and
+	-- throwable; damage is flat rather than combo-scaled since they're not a
+	-- Main Weapon.
+	WeaponPickup = {
+		ThrowDamage = 15,
+		MeleeDamage = 10, -- flat damage per swing while holding a secondary weapon
+		MeleeSwings = 3, -- "short combo" (§3.5) — a fixed number of swings before it's spent
 	},
 }

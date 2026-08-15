@@ -38,6 +38,8 @@ return {
 	Weapons = {
 		TwinBlades = {
 			DisplayName = "Twin Blades",
+			Range = 6, -- studs; §5.2 "low-reach"
+			Arc = 60, -- degrees, full swing arc centered on the attacker's facing
 			ComboTree = comboString(0.9, 0.32, 1.3, 0.63),
 			AirComboAnimationId = 0,
 			RunningAttackAnimationId = 0,
@@ -52,6 +54,8 @@ return {
 		},
 		WarStaff = {
 			DisplayName = "War Staff",
+			Range = 9, -- studs; §5.2 "medium reach"
+			Arc = 70,
 			ComboTree = comboString(1.0, 0.37, 1.6, 0.75),
 			AirComboAnimationId = 0,
 			RunningAttackAnimationId = 0,
@@ -66,6 +70,8 @@ return {
 		},
 		HookSwords = {
 			DisplayName = "Hook Swords",
+			Range = 8, -- studs; chain-grapple pulls enemies into medium reach
+			Arc = 60,
 			ComboTree = comboString(1.0, 0.35, 1.4, 0.69),
 			AirComboAnimationId = 0,
 			RunningAttackAnimationId = 0,
@@ -80,6 +86,8 @@ return {
 		},
 		IronGauntlets = {
 			DisplayName = "Iron Gauntlets",
+			Range = 5, -- studs; §5.2 close-range, highest poise damage
+			Arc = 50,
 			ComboTree = comboString(1.2, 0.43, 1.8, 0.86),
 			AirComboAnimationId = 0,
 			RunningAttackAnimationId = 0,
@@ -94,6 +102,8 @@ return {
 		},
 		BattleGlaive = {
 			DisplayName = "Battle Glaive",
+			Range = 12, -- studs; §5.2 "longest reach"
+			Arc = 80, -- arcing sweeps
 			ComboTree = comboString(1.05, 0.37, 1.5, 0.74),
 			AirComboAnimationId = 0,
 			RunningAttackAnimationId = 0,

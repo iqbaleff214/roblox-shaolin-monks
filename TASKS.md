@@ -149,77 +149,77 @@ Each config module is pure data (no side effects), matching the example shapes i
 **Description:** Map raw PC/mobile/console inputs (GDD §6 tables) to a single set of logical actions (`LightAttack`, `HeavyAttack`, `Block`, `Dodge`, `Grab`, `Interact`, `ThrowWeapon`, `Ultimate`, `LockOn`) so all downstream combat code is input-device-agnostic.
 **DoD / Expected Output:** Every action in the §6 tables for all three platforms fires the correct logical action; no combat code references raw `UserInputType`/`KeyCode` directly.
 **Test Case:** TestEZ-style unit test on the mapping table itself (pure data) plus manual verification per platform (ties into S-110/S-111/S-112).
-- [ ] Done
+- [x] Done
 
 #### T-041 — Combo buffer / attack string system
 **Depends on:** T-010, T-011, T-040
 **Description:** Buffers Light/Heavy inputs into strings per weapon's combo tree (T-011), respecting `ComboWindow`; string length/finishers gated by owned Combo Scrolls (T-111).
 **DoD / Expected Output:** Un-owned combo extensions are simply unavailable (input has no effect past the owned string length) rather than erroring.
 **Test Case:** Integration test: feed a scripted input sequence, assert the resulting combo step matches the weapon's combo tree and stops at the player's unlocked depth.
-- [ ] Done
+- [x] Done
 
 #### T-042 — Attack hit detection (client-predicted + server-reconciled)
 **Depends on:** T-041, T-060
 **Description:** Implements the lag-compensation model from GDD §17.1: client plays hit feedback instantly; server rewinds enemy hitboxes to the attacker's input timestamp before committing damage; client-side speculative FX are silently retracted on server rejection.
 **DoD / Expected Output:** No visible rubber-banding/position snapping on rejected hits; server is sole authority on whether damage is applied.
 **Test Case:** Integration test with artificial latency injection (e.g. 150ms simulated) confirming hits still register fairly for the attacker and enemy HP only changes after server confirmation.
-- [ ] Done
+- [x] Done
 
 #### T-043 — Block, Parry & Dodge system
 **Depends on:** T-010, T-040
 **Description:** Hold-to-block damage reduction + stagger-buildup prevention; Perfect Parry timing window (`ParryWindow`) fully negates damage and stuns attacker.
 **DoD / Expected Output:** Parry input outside the window degrades to a normal block (partial mitigation), never a whiff-punish for the player.
 **Test Case:** Integration test sweeping input timing from -200ms to +200ms relative to impact, asserting Perfect Parry only triggers inside `ParryWindow`.
-- [ ] Done
+- [x] Done
 
 #### T-044 — Grapple, throw & environmental kill system
 **Depends on:** T-046 (staggered state), S-002 (HazardZone tag)
 **Description:** Grab staggered enemy → throw into another enemy (both take damage) or into a tagged `HazardZone` (instant kill + bonus relic drop per §3.4).
 **DoD / Expected Output:** Human-shield behavior (§3.4) absorbs 1–2 ranged hits before the shielded enemy is dropped/killed.
 **Test Case:** Integration test: throw a grabbed enemy into a `HazardZone`-tagged part, assert instant death + bonus drop event fires exactly once.
-- [ ] Done
+- [x] Done
 
 #### T-045 — Weapon pickup / disarm / throw system
 **Depends on:** T-011, T-060
 **Description:** Implements §3.5 — enemy weapon drop on disarm (chance-based on Heavy Attack vs. blocking enemy), environmental weapon pickup, temporary secondary-weapon combo + throw, main weapon is never lost.
 **DoD / Expected Output:** A thrown secondary weapon becomes a lootable world item on impact (retrievable) unless it hits an enemy, matching §3.5's "lost unless retrieved" rule.
 **Test Case:** Integration test: force a disarm roll to succeed, assert enemy loses block capability and a pickup item spawns at their weapon socket.
-- [ ] Done
+- [x] Done
 
 #### T-046 — Stagger / Poise / Finishing Move system
 **Depends on:** T-010, T-042
 **Description:** Poise meter fills on hits, decays per `PoiseDecayPerSec` when untouched, triggers Staggered state at `StaggerThreshold`; Staggered enemies accept a context Finishing Move input that grants bonus Coins + guaranteed relic (§3.9, §10.2/§10.4 hookup).
 **DoD / Expected Output:** Bosses/Elites use this same Poise system but gate phase transitions instead of an instant finisher (hands off to T-065).
 **Test Case:** Integration test: apply hits until Poise crosses threshold, assert Staggered state fires once and Finishing Move input is only accepted in that state.
-- [ ] Done
+- [x] Done
 
 #### T-047 — Chi meter & Ultimate activation
 **Depends on:** T-010, T-071
 **Description:** Chi fills from `GainPerHitDealt`/`GainPerHitTaken`, caps at `Max`; Ultimate button executes the equipped weapon's Ultimate (T-071/T-072) and resets meter to 0.
 **DoD / Expected Output:** Ultimate cannot be triggered below 100 Chi; server is authoritative on the meter value (client only renders it).
 **Test Case:** Integration test: attempt Ultimate activation at 99 and 100 Chi, assert rejection/success respectively.
-- [ ] Done
+- [x] Done
 
 #### T-048 — Combo Counter & Style Score tracking
 **Depends on:** T-041, T-046
 **Description:** Rolling ~2s hit window extends a live Combo Counter (§3.7); counter feeds a per-arena Style Score used for the reward multiplier (§9.1, §10.1).
 **DoD / Expected Output:** Combo reset on hit-taken or timeout does not retroactively reduce Style Score already banked from that combo (per §3.7's "does not penalize already-earned rewards" rule).
 **Test Case:** Integration test: build a combo, get hit (reset), verify Style Score total is unaffected by the reset event itself.
-- [ ] Done
+- [x] Done
 
 #### T-049 — CombatService (server, authoritative)
 **Depends on:** T-042, T-043, T-046, T-047
 **Description:** Single server-side service owning all damage resolution, currency/XP grants from combat, and validation against `CombatConfig`/`EnemyConfig` — the enforcement point for §17.2 Anti-Cheat.
 **DoD / Expected Output:** No other server script writes damage/currency/XP directly; all combat-sourced state changes route through this service.
 **Test Case:** Integration test (see also T-170): attempt to fire a damage-granting RemoteEvent directly bypassing CombatService and assert it is rejected/ignored.
-- [ ] Done
+- [x] Done
 
 #### T-050 — Concurrent-attacker-cap token system
 **Depends on:** T-012, T-060
 **Description:** Server-side token queue enforcing the 2–3 concurrent-attacker cap (§4.3/§4.4) so only capped enemies are in an "attacking" state at once; others hold in the ring/circling state.
 **DoD / Expected Output:** With N enemies aggroed in an arena, at most `EnemyConfig.ConcurrentAttackerCap` are ever in the Attacking state simultaneously, verified under load with the max enemy count expected in a Master-tier wave.
 **Test Case:** Integration test: aggro 8 enemies onto one target, assert active-attacker count never exceeds the configured cap across a sampled time window.
-- [ ] Done
+- [x] Done
 
 ---
 
