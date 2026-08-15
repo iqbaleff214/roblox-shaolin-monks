@@ -18,6 +18,7 @@ local Config = {
 	UI = require(script.Parent.config.UIConfig),
 	Localization = require(script.Parent.config.LocalizationConfig),
 	Quest = require(script.Parent.config.QuestConfig),
+	BattlePass = require(script.Parent.config.BattlePassConfig),
 }
 
 return Config

@@ -411,56 +411,56 @@ Each config module is pure data (no side effects), matching the example shapes i
 **Description:** Server-authoritative Coins and Jade Shards; enforces the one-way economy (Coins never convert to Jade, per T-018's `CoinToJadeRate = nil` guard).
 **DoD / Expected Output:** Every currency mutation goes through one function (`GrantCurrency`/`SpendCurrency`) that logs source and validates against negative balances.
 **Test Case:** Integration test: attempt to spend more Coins than the player has, assert rejection with no partial deduction.
-- [ ] Done
+- [x] Done
 
 #### T-111 — Combo Scroll Shop (Sifu's Dojo) purchase logic
 **Depends on:** T-017, T-110, T-041
 **Description:** Coins-only purchase flow unlocking Combo Scrolls (extended combo strings, finishers, weapon techniques) per §10.3; gated against `ProgressionConfig` prerequisites where applicable.
 **DoD / Expected Output:** No code path allows a Combo Scroll purchase using Jade Shards, even via a malformed/replayed client request — server checks `ShopConfig` currency type server-side, not client-declared.
 **Test Case:** Integration test: send a purchase request with a spoofed "Jade" currency flag for a Combo Scroll item, assert server rejects it and falls back to the Coins price from config.
-- [ ] Done
+- [x] Done
 
 #### T-112 — Cosmetic Shop purchase logic
 **Depends on:** T-017, T-110, T-081
 **Description:** Coins/Jade priced cosmetic purchases (§11.2) granting into inventory (T-081).
 **DoD / Expected Output:** Purchase price is always read server-side from `ShopConfig`, never trusted from the client request payload.
 **Test Case:** Integration test: send a purchase request with a client-supplied price of `0`, assert the server charges the configured price instead.
-- [ ] Done
+- [x] Done
 
 #### T-113 — GamePass purchase handling (VIP)
 **Depends on:** T-018, T-110, S-080
 **Description:** On VIP GamePass ownership: apply +25% XP/Coin boost (T-090/T-110 hookup), grant VIP Training Hall access, VIP badge, monthly cosmetic drop while active (§11.3).
 **DoD / Expected Output:** Boost application checks live ownership via `MarketplaceService:UserOwnsGamePassAsync` (not a cached/DataStore flag alone) to avoid stale-ownership exploits after a potential refund.
 **Test Case:** Integration test (mocked `MarketplaceService`): toggle simulated ownership true/false, assert boost application follows it each session.
-- [ ] Done
+- [x] Done
 
 #### T-114 — Developer Product purchase handling (Jade Shards)
 **Depends on:** T-018, T-110, S-082
 **Description:** `ProcessReceipt` implementation for the 3 Jade Shard product tiers (§14.5); must be idempotent (a receipt is never double-granted, per Roblox's `ProcessReceipt` contract).
 **DoD / Expected Output:** Handles the case where `ProcessReceipt` is called again for an already-granted purchase ID (e.g. after a server restart) by returning `PurchaseGranted` without re-granting currency.
 **Test Case:** Integration test (mocked receipt): call the handler twice with the same `PurchaseId`, assert Jade Shards are only credited once.
-- [ ] Done
+- [x] Done
 
 #### T-115 — Battle Pass system
 **Depends on:** T-090, T-018, S-081
 **Description:** 50-tier seasonal pass; free track always active, premium track unlocked via GamePass/Product ownership; tier XP separate from player-level XP (§11.4).
 **DoD / Expected Output:** Premium-track rewards are withheld (not previewed as claimable) for non-owners, but tier progress still accrues so a later purchase retroactively unlocks earned tiers.
 **Test Case:** Integration test: advance tier progress without premium ownership, then grant ownership, assert all previously-earned premium rewards become claimable immediately (not just future tiers).
-- [ ] Done
+- [x] Done
 
 #### T-116 — Limited-time item rotation system
 **Depends on:** T-017
 **Description:** 48-hour rotating cosmetics and holiday bundles (§11.5); enforces items never return after their window closes.
 **DoD / Expected Output:** A "never returns" list persists server-side so a config revert/typo can't accidentally re-offer an expired item.
 **Test Case:** Integration test: expire an item, then attempt to re-add an identical item ID to the active rotation, assert it's blocked by the permanent-expiry record.
-- [ ] Done
+- [x] Done
 
 #### T-117 — Cosmetic Crate opening system
 **Depends on:** T-014, T-101, T-103
 **Description:** Opens crates earned via gameplay or purchased with Jade Shards, rolling against the published `LootConfig` odds (§11.6); routes through duplicate-protection (T-103).
 **DoD / Expected Output:** No direct Robux-to-crate purchase path exists anywhere in the purchase flow (§11.6 policy compliance) — crates are only obtained via gameplay or Jade (itself Robux-purchased, but with a currency step in between, per Roblox UGC policy).
 **Test Case:** Integration test / code audit: assert no `ProcessReceipt` handler grants a crate directly; all crate grants trace back to gameplay events or Jade-currency spend.
-- [ ] Done
+- [x] Done
 
 ---
 

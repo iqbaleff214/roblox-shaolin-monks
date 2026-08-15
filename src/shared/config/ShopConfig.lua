@@ -95,4 +95,21 @@ return {
 			Contents = { "Shop_HeadMonkHood", "Shop_TwinBladesSkin_Jade" },
 		},
 	},
+
+	-- §11.6: Jade-purchased cosmetic crates. ChestTier references
+	-- LootConfig.ChestRarityWeights — the same rarity table gameplay-earned
+	-- chests roll against (T-102/T-117), so a purchased crate is never
+	-- better odds than an equivalent gameplay chest.
+	Crates = {
+		{ Id = "StandardCrate", DisplayName = "Standard Cosmetic Crate", Currency = "Jade", Price = 100, ChestTier = "Vault" },
+	},
+
+	-- §11.5: 48-hour rotating limited cosmetics. `Pool` references existing
+	-- Cosmetics Ids — LimitedRotationService (T-116) never offers an item
+	-- outside this catalog and never re-offers one after its window closes.
+	LimitedRotation = {
+		DurationHours = 48,
+		ActiveCount = 2,
+		Pool = { "Shop_TwinBladesSkin_Jade", "Shop_UltimateFx_Emberglow", "Shop_Emote_MeditationIdle" },
+	},
 }

@@ -16,17 +16,18 @@ local EXPECTED_KEYS = {
 	"UI",
 	"Localization",
 	"Quest",
+	"BattlePass",
 }
 
 return function()
 	describe("ConfigService", function()
-		it("should expose all 13 config modules as non-nil tables (§14.6)", function()
+		it("should expose all 14 config modules as non-nil tables (§14.6)", function()
 			for _, key in EXPECTED_KEYS do
 				expect(ConfigService[key]).to.be.a("table")
 			end
 		end)
 
-		it("should expose exactly 13 keys, no more, no less", function()
+		it("should expose exactly 14 keys, no more, no less", function()
 			local count = 0
 			for _ in ConfigService do
 				count += 1

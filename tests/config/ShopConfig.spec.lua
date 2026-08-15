@@ -46,5 +46,33 @@ return function()
 				end
 			end
 		end)
+
+		it("should price every Crate in Jade only (§11.6: no direct Robux-to-crate path)", function()
+			expect(#ShopConfig.Crates > 0).to.equal(true)
+			for _, crate in ShopConfig.Crates do
+				expect(crate.Currency).to.equal("Jade")
+				expect(crate.Price > 0).to.equal(true)
+			end
+		end)
+
+		it("should reference a valid LootConfig chest tier for every Crate", function()
+			local LootConfig = require(ReplicatedStorage.Shared.config.LootConfig)
+			for _, crate in ShopConfig.Crates do
+				expect(LootConfig.ChestRarityWeights[crate.ChestTier]).to.be.a("table")
+			end
+		end)
+
+		it("should define a positive LimitedRotation duration and only reference existing Cosmetics Ids", function()
+			expect(ShopConfig.LimitedRotation.DurationHours > 0).to.equal(true)
+			expect(ShopConfig.LimitedRotation.ActiveCount > 0).to.equal(true)
+
+			local cosmeticIds = {}
+			for _, item in ShopConfig.Cosmetics do
+				cosmeticIds[item.Id] = true
+			end
+			for _, id in ShopConfig.LimitedRotation.Pool do
+				expect(cosmeticIds[id]).to.equal(true)
+			end
+		end)
 	end)
 end

@@ -54,13 +54,21 @@ end
 
 -- Server-internal: the one function that ever mutates XP. `source` is logged
 -- for future anti-cheat/audit purposes (mirrors T-110's currency-grant DoD).
+-- T-113: VIPService sets the `IsVIP` attribute; a VIP player's grant is
+-- boosted by MonetizationConfig.VIPBoostXP.
 function ProgressionService:GrantXP(player: Player, amount: number, source: string)
 	if amount <= 0 then
 		return
 	end
+
+	local grantedAmount = amount
+	if player:GetAttribute("IsVIP") == true then
+		grantedAmount = math.floor(amount * (1 + ConfigService.Monetization.VIPBoostXP))
+	end
+
 	local state = getState(player)
-	state.totalXP += amount
-	ProgressionService.XPGranted:Fire(player, amount, source, state.totalXP)
+	state.totalXP += grantedAmount
+	ProgressionService.XPGranted:Fire(player, grantedAmount, source, state.totalXP)
 
 	local newLevel = LevelCurve.levelForXP(state.totalXP)
 	while state.level < newLevel do

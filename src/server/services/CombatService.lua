@@ -48,6 +48,7 @@ local ParryTiming = require(ReplicatedStorage.Shared.modules.ParryTiming)
 local CombatConfig = ConfigService.Combat
 local WeaponConfig = ConfigService.Weapon
 local EnemyConfig = ConfigService.Enemy
+local ShopConfig = ConfigService.Shop
 
 local ENEMY_TAG = "Enemy"
 local DEFAULT_WEAPON_ID = "TwinBlades"
@@ -90,6 +91,20 @@ local function getEquippedWeaponId(player: Player): string
 	return DEFAULT_WEAPON_ID
 end
 
+-- T-111: full combo-tree depth once the matching Combo Scroll is owned
+-- (InventoryService, "ComboScroll" category); otherwise ComboTreeWalker's
+-- own default (step 1 only — Light/Heavy attacks remain always-available at
+-- flat damage regardless, per this file's header note).
+local function getUnlockedComboDepth(player: Player, weaponId: string): number
+	local InventoryService = Knit.GetService("InventoryService")
+	for _, scroll in ShopConfig.ComboScrolls do
+		if scroll.WeaponId == weaponId and InventoryService:IsOwned(player, "ComboScroll", scroll.Id) then
+			return #WeaponConfig.Weapons[weaponId].ComboTree
+		end
+	end
+	return ComboTreeWalker.DEFAULT_UNLOCKED_DEPTH
+end
+
 local function getPlayerState(player: Player): PlayerState
 	local state = playerStates[player]
 	if state then
@@ -102,7 +117,11 @@ local function getPlayerState(player: Player): PlayerState
 	local chiBonus = player:GetAttribute("ChiBonus")
 	local chiMax = CombatConfig.ChiMeter.Max + (if type(chiBonus) == "number" then chiBonus else 0)
 	state = {
-		comboWalker = ComboTreeWalker.new(WeaponConfig.Weapons[weaponId].ComboTree, CombatConfig.Attacks.ComboWindow),
+		comboWalker = ComboTreeWalker.new(
+			WeaponConfig.Weapons[weaponId].ComboTree,
+			CombatConfig.Attacks.ComboWindow,
+			getUnlockedComboDepth(player, weaponId)
+		),
 		weaponId = weaponId,
 		chi = ChiMeterState.new(chiMax),
 		styleScore = StyleScoreTracker.new(),
