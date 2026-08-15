@@ -12,8 +12,11 @@
 -- (a chapter-clear/quest-completion hookup, Phase 10) — the same
 -- forward-dependency seam used throughout this codebase.
 --
--- Persistence seam: in-memory this session; T-160 (Phase 14) will persist
--- tierXP and claimed rewards for real.
+-- Persistence: `PlayerDataService` (T-160, Phase 14) now exists with
+-- matching `BattlePassTierXP`/`BattlePassClaimed` profile fields, but this
+-- service isn't wired to it yet — still in-memory per session, ready for
+-- the same direct-profile-access retrofit CurrencyService (T-110) and
+-- ProgressionService (T-090) already demonstrate.
 
 local Players = game:GetService("Players")
 local MarketplaceService = game:GetService("MarketplaceService")

@@ -19,11 +19,17 @@
 -- re-derives itself — and applies MonetizationConfig.VIPBoostCoins only to
 -- Coins (never Jade, which is Robux-purchased already).
 --
--- Persistence seam: in-memory this session, same interim pattern as every
--- other player-data system here; T-160 (Phase 14) will back it with real
--- DataStore persistence.
+-- Persistence (T-160, Phase 14): this service holds no balance state of its
+-- own — every read/write goes straight through
+-- PlayerDataService:GetProfile(player).Coins/.Jade, the single live source
+-- of truth. Deliberately NOT a local cache hydrated once from the profile:
+-- PlayerDataService's async load mutates the profile table's fields in
+-- place whenever it resolves, so a separate local cache taken before that
+-- finishes would freeze at the pre-load default and never see the loaded
+-- value. Reading the profile field directly on every call sidesteps that
+-- race entirely — the reference integration pattern for the rest of
+-- §17.3's data list.
 
-local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Knit = require(ReplicatedStorage.Packages.Knit)
@@ -43,16 +49,8 @@ CurrencyService.CurrencyGranted = Signal.new()
 -- (player: Player, currency: string, amount: number, source: string, newBalance: number)
 CurrencyService.CurrencySpent = Signal.new()
 
-type Balances = { Coins: number, Jade: number }
-local balances: { [Player]: Balances } = {}
-
-local function getBalances(player: Player): Balances
-	local balance = balances[player]
-	if not balance then
-		balance = { Coins = 0, Jade = 0 }
-		balances[player] = balance
-	end
-	return balance
+local function getProfile(player: Player)
+	return Knit.GetService("PlayerDataService"):GetProfile(player)
 end
 
 -- Server-internal: the sole writer that increases a balance. Coins-only VIP
@@ -68,9 +66,9 @@ function CurrencyService:GrantCurrency(player: Player, currency: string, amount:
 		grantedAmount = math.floor(amount * (1 + MonetizationConfig.VIPBoostCoins))
 	end
 
-	local balance = getBalances(player)
-	balance[currency] += grantedAmount
-	CurrencyService.CurrencyGranted:Fire(player, currency, grantedAmount, source, balance[currency])
+	local profile = getProfile(player)
+	profile[currency] += grantedAmount
+	CurrencyService.CurrencyGranted:Fire(player, currency, grantedAmount, source, profile[currency])
 end
 
 -- Server-internal: the sole writer that decreases a balance. Rejects
@@ -80,13 +78,13 @@ function CurrencyService:SpendCurrency(player: Player, currency: string, amount:
 		return false
 	end
 
-	local balance = getBalances(player)
-	if balance[currency] < amount then
+	local profile = getProfile(player)
+	if profile[currency] < amount then
 		return false
 	end
 
-	balance[currency] -= amount
-	CurrencyService.CurrencySpent:Fire(player, currency, amount, source, balance[currency])
+	profile[currency] -= amount
+	CurrencyService.CurrencySpent:Fire(player, currency, amount, source, profile[currency])
 	return true
 end
 
@@ -94,7 +92,7 @@ function CurrencyService:GetBalance(player: Player, currency: string): number
 	if not VALID_CURRENCIES[currency] then
 		return 0
 	end
-	return getBalances(player)[currency]
+	return getProfile(player)[currency]
 end
 
 function CurrencyService.Client:GetBalance(player: Player, currency: string): number
@@ -105,12 +103,6 @@ local function onRewardRolled(player: Player, rewardType: string, amount: number
 	if rewardType == "Coins" and amount then
 		CurrencyService:GrantCurrency(player, "Coins", amount, source)
 	end
-end
-
-function CurrencyService:KnitInit()
-	Players.PlayerRemoving:Connect(function(player)
-		balances[player] = nil
-	end)
 end
 
 function CurrencyService:KnitStart()

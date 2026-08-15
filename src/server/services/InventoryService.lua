@@ -5,12 +5,14 @@
 -- systems (shop purchase, crate open, quest reward, chapter completion —
 -- Phase 8/9's T-101/T-103/T-112/T-117, none built yet) call it.
 --
--- Persistence seam: `PlayerDataService` (T-160, Phase 14) doesn't exist yet.
--- This service holds inventory in memory per session, the same interim
--- state every other player-data system in this codebase currently uses
--- (WeaponService's loadout, CombatService's PlayerState, etc.) — T-160
--- adding real DataStore persistence later means this service loads from and
--- saves to it, not a redesign.
+-- Persistence: `PlayerDataService` (T-160, Phase 14) now exists and its
+-- profile schema already has a matching `Inventory` field, but this service
+-- isn't wired to it yet — still in-memory per session, the same interim
+-- state WeaponService's loadout/CombatService's PlayerState use. Follows
+-- CurrencyService's (T-110) integration pattern when it happens: read/write
+-- `PlayerDataService:GetProfile(player).Inventory` directly on every call
+-- rather than caching a local copy, so an in-flight async load can never be
+-- shadowed by a stale pre-load snapshot.
 
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")

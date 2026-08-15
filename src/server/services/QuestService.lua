@@ -19,9 +19,12 @@
 -- flows (Phase 10) — `IncrementProgress`/`CompleteQuest` are real, ready,
 -- server-internal methods for those future callers.
 --
--- Persistence seam: in-memory this session, same interim pattern as every
--- other player-data system here; T-160 (Phase 14) will back it with real
--- DataStore persistence.
+-- Persistence: `PlayerDataService` (T-160, Phase 14) now exists with a
+-- matching `QuestProgress` profile field (period ids + Daily/Weekly
+-- progress + DistinctBossesDefeated), but this service isn't wired to it
+-- yet — still in-memory per session, ready for the same direct-profile-
+-- access retrofit CurrencyService (T-110) and ProgressionService (T-090)
+-- already demonstrate.
 
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")

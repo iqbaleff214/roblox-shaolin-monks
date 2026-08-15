@@ -11,8 +11,11 @@
 -- ProgressionService's GrantChapterClearXP) — Phase 8/10's eventual
 -- chapter/arena-clear flow is expected to supply that boolean.
 --
--- Persistence seam: in-memory this session; T-160 (Phase 14) will persist
--- `loginStreak`/`lastLoginPeriodId` for real across server restarts.
+-- Persistence: `PlayerDataService` (T-160, Phase 14) now exists with
+-- matching `LoginStreak`/`LastLoginPeriodId` profile fields, but this
+-- service isn't wired to it yet — still in-memory per session, ready for
+-- the same direct-profile-access retrofit CurrencyService (T-110) and
+-- ProgressionService (T-090) already demonstrate.
 
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")

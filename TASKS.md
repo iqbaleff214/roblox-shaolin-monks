@@ -627,28 +627,28 @@ Each config module is pure data (no side effects), matching the example shapes i
 **Description:** `DataStoreService`-backed storage for level, XP, Coins, Jade, inventory, skill tree allocation, chapter progress, quest progress, mastery stars, streak (§17.3).
 **DoD / Expected Output:** Single service is the only code path that touches the player DataStore — no other script calls `DataStoreService` directly.
 **Test Case:** Integration test: write via the service, simulate a server restart (fresh session), read back, assert values match.
-- [ ] Done
+- [x] Done
 
 #### T-161 — Auto-save hooks
 **Depends on:** T-160
 **Description:** Saves on chapter completion and Lobby return (§17.3), not only on player-leaving (which risks data loss on crashes).
 **DoD / Expected Output:** A simulated ungraceful disconnect immediately after a chapter-complete event still persists that chapter's rewards (because the auto-save already fired before disconnect).
 **Test Case:** Integration test: trigger chapter-complete, immediately force-disconnect the simulated session, assert the save already landed.
-- [ ] Done
+- [x] Done
 
 #### T-162 — Retry/backoff + backup store fallback
 **Depends on:** T-160
 **Description:** Exponential backoff retry on DataStore failure; writes to a backup store on second consecutive failure (§17.3).
 **DoD / Expected Output:** A simulated DataStore outage (mocked failure) results in data landing in the backup store rather than being silently dropped.
 **Test Case:** Integration test: mock 2 consecutive save failures, assert backup-store write occurs and is logged for reconciliation.
-- [ ] Done
+- [x] Done
 
 #### T-163 — Data migration/versioning scaffold
 **Depends on:** T-160
 **Description:** Schema version field on saved data plus safe-default logic for new fields added post-launch (not in original GDD but necessary for "without bugs" long-term maintenance — new systems will add save fields over time).
 **DoD / Expected Output:** Loading a save written before a new field existed does not error; the field is populated with a safe default and persisted on next save.
 **Test Case:** Integration test: load a fixture save payload missing a newer field, assert no error and correct default applied.
-- [ ] Done
+- [x] Done
 
 ---
 

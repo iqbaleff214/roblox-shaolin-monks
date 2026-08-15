@@ -8,9 +8,11 @@
 -- `RecordChapterClear` is server-internal, real, and ready — it awaits the
 -- same not-yet-built "chapter clear" trigger as ProgressionService's
 -- GrantChapterClearXP and LeaderboardService's SubmitClearTime/SubmitStyleScore
--- (Phase 10's Party/Chapter flow). Persistence seam: in-memory this session,
--- same interim pattern as every other player-data system here; T-160 (Phase
--- 14) will back it with real DataStore persistence.
+-- (Phase 10's Party/Chapter flow). Persistence: `PlayerDataService` (T-160,
+-- Phase 14) now exists with a matching `MasteryStars` profile field, but
+-- this service isn't wired to it yet — still in-memory per session, ready
+-- for the same direct-profile-access retrofit CurrencyService (T-110) and
+-- ProgressionService (T-090) already demonstrate.
 
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
