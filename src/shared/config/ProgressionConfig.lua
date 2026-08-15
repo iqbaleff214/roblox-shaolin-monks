@@ -66,4 +66,27 @@ function ProgressionConfig.StatGrowth.ChiBonusAtLevel(level: number): number
 	return cappedLevel * CHI_PER_RANK
 end
 
+-- §9.2: numeric effect sizes for the non-stat Skill Tree nodes (T-091) — kept
+-- here, not inline in SkillTreeService, per the "no magic numbers" rule.
+ProgressionConfig.SkillEffects = {
+	DodgeCooldownReductionSeconds = 0.5,
+	ParryWindowExtensionSeconds = 0.05,
+}
+
+-- §9.3: Mastery Stars. Each chapter clear earns 0-3 stars from three
+-- independent pass/fail criteria; milestone totals unlock permanent cosmetics.
+ProgressionConfig.Mastery = {
+	StyleScoreThreshold = 500, -- Style Score at/above this earns the Style star
+	MaxDamageTakenForStar = 50, -- damage taken at/below this earns the Survival star
+	ClearTimeThresholdSeconds = 180, -- clear time at/below this earns the Speed star
+	MilestoneTotals = { 15, 40, 75, 120 },
+}
+
+-- §9.5: Streak system tuning.
+ProgressionConfig.Streak = {
+	LoginStreakMilestoneDays = 7, -- every Nth consecutive login day grants a premium drop
+	FlawlessArenaBaseBonus = 50, -- Coins granted on the 2nd consecutive Flawless arena clear
+	FlawlessArenaBonusPerStreak = 25, -- additional Coins per consecutive Flawless clear beyond the 2nd
+}
+
 return ProgressionConfig

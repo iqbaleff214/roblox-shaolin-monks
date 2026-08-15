@@ -333,42 +333,42 @@ Each config module is pure data (no side effects), matching the example shapes i
 **Description:** Server-authoritative XP grant using `BaseXP × DifficultyMultiplier × StyleScoreMultiplier` (§9.1); level-up unlocks Skill Points, not raw stats.
 **DoD / Expected Output:** XP is only ever written by server code that has validated the source (chapter clear, quest, daily bonus) — never client-supplied.
 **Test Case:** Integration test: simulate a Flawless clear vs. a multi-death clear of the same chapter, assert XP output ratio matches the 2.5×/0.5× multiplier table.
-- [ ] Done
+- [x] Done
 
 #### T-091 — Skill Tree system
 **Depends on:** T-016, T-090
 **Description:** Server-validated Skill Point spend on nodes (extended combos, double-jump, dodge cooldown, parry window, weapon retrieval speed, capped HP/Chi growth) per §9.2.
 **DoD / Expected Output:** Stat-growth nodes cannot be purchased past the Level-30 cap defined in `ProgressionConfig` (T-016) even if the player has banked enough points — enforces the "same combat ceiling for everyone" pillar.
 **Test Case:** Integration test: attempt to purchase a capped stat node beyond its max rank, assert rejection.
-- [ ] Done
+- [x] Done
 
 #### T-092 — Mastery Stars calculation
 **Depends on:** T-048, T-090
 **Description:** 0–3 stars per chapter from Style Score, damage taken, and clear time (§9.3); milestone totals (15/40/75/120) unlock permanent cosmetics.
 **DoD / Expected Output:** Star calculation is a pure function of the three inputs (testable without live gameplay) so tuning thresholds doesn't require a full replay to verify.
 **Test Case:** TestEZ spec feeds boundary-value inputs (just below/at/above each threshold) and asserts correct star count.
-- [ ] Done
+- [x] Done
 
 #### T-093 — Daily / Weekly Quest system
 **Depends on:** T-160
 **Description:** Quest definitions, progress tracking, and reward grant for the examples in §9.4 (Finishing Moves landed, containers broken, chapterless-death clears, Trial Rush wins, boss variety, hidden containers found).
 **DoD / Expected Output:** Quest progress persists across sessions (via T-160) and resets on the correct cadence (daily = midnight UTC per §7.4, weekly = matches §9.7/§7.3 reset).
 **Test Case:** Integration test: simulate quest-qualifying actions, assert progress increments correctly and resets at the configured boundary.
-- [ ] Done
+- [x] Done
 
 #### T-094 — Streak system
 **Depends on:** T-160
 **Description:** Login streak (day 7 = premium drop) and in-run consecutive-Flawless-arena streak bonus (§9.5).
 **DoD / Expected Output:** A missed login day resets the streak counter to 0, not to 1 (common off-by-one bug to guard against explicitly).
 **Test Case:** Integration test: simulate logins on days 1,2,3, skip day 4, log in day 5 — assert streak counter is 1 (fresh start), not 4.
-- [ ] Done
+- [x] Done
 
 #### T-095 — Leaderboard system
 **Depends on:** T-090, T-092
 **Description:** Per-chapter best clear time + Style Score (all-time and weekly), friends-prioritized display, separate Trial Rush weekly board (§9.7, §7.3).
 **DoD / Expected Output:** Uses `OrderedDataStore` (or equivalent) with weekly boards resetting on schedule without losing all-time records.
 **Test Case:** Integration test: submit scores from multiple simulated players, assert correct ordering and that a weekly reset does not clear the all-time board.
-- [ ] Done
+- [x] Done
 
 ---
 

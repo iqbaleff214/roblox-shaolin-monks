@@ -96,10 +96,15 @@ local function getPlayerState(player: Player): PlayerState
 		return state
 	end
 	local weaponId = getEquippedWeaponId(player)
+	-- T-091: SkillTreeService's ChiGrowth node sets this attribute; absent
+	-- (or non-numeric) means no rank purchased yet, i.e. the original,
+	-- unmodified Chi cap.
+	local chiBonus = player:GetAttribute("ChiBonus")
+	local chiMax = CombatConfig.ChiMeter.Max + (if type(chiBonus) == "number" then chiBonus else 0)
 	state = {
 		comboWalker = ComboTreeWalker.new(WeaponConfig.Weapons[weaponId].ComboTree, CombatConfig.Attacks.ComboWindow),
 		weaponId = weaponId,
-		chi = ChiMeterState.new(CombatConfig.ChiMeter.Max),
+		chi = ChiMeterState.new(chiMax),
 		styleScore = StyleScoreTracker.new(),
 		isBlocking = false,
 		blockStartedAt = nil :: number?,
@@ -264,7 +269,10 @@ function CombatService:ApplyDamageToPlayer(player: Player, amount: number, impac
 
 	local state = getPlayerState(player)
 	local timingDelta = if state.isBlocking and state.blockStartedAt then state.blockStartedAt - impactTime else nil
-	local parryResult = ParryTiming.classify(timingDelta, CombatConfig.Attacks.ParryWindow)
+	-- T-091: SkillTreeService's ParryWindowExtension node sets this attribute.
+	local parryWindowBonus = player:GetAttribute("ParryWindowBonus")
+	local parryWindow = CombatConfig.Attacks.ParryWindow + (if type(parryWindowBonus) == "number" then parryWindowBonus else 0)
+	local parryResult = ParryTiming.classify(timingDelta, parryWindow)
 
 	local finalDamage = amount
 	if parryResult == "PerfectParry" then

@@ -17,6 +17,7 @@ local Config = {
 	Audio = require(script.Parent.config.AudioConfig),
 	UI = require(script.Parent.config.UIConfig),
 	Localization = require(script.Parent.config.LocalizationConfig),
+	Quest = require(script.Parent.config.QuestConfig),
 }
 
 return Config

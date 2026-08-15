@@ -43,5 +43,29 @@ return function()
 				previous = threshold
 			end
 		end)
+
+		it("should define positive Skill Effect magnitudes (§9.2)", function()
+			expect(ProgressionConfig.SkillEffects.DodgeCooldownReductionSeconds > 0).to.equal(true)
+			expect(ProgressionConfig.SkillEffects.ParryWindowExtensionSeconds > 0).to.equal(true)
+		end)
+
+		it("should define Mastery Star thresholds and an ascending milestone list (§9.3)", function()
+			local mastery = ProgressionConfig.Mastery
+			expect(mastery.StyleScoreThreshold > 0).to.equal(true)
+			expect(mastery.MaxDamageTakenForStar >= 0).to.equal(true)
+			expect(mastery.ClearTimeThresholdSeconds > 0).to.equal(true)
+
+			local previous = 0
+			for _, total in mastery.MilestoneTotals do
+				expect(total > previous).to.equal(true)
+				previous = total
+			end
+		end)
+
+		it("should define positive Streak tuning values (§9.5)", function()
+			expect(ProgressionConfig.Streak.LoginStreakMilestoneDays > 0).to.equal(true)
+			expect(ProgressionConfig.Streak.FlawlessArenaBaseBonus > 0).to.equal(true)
+			expect(ProgressionConfig.Streak.FlawlessArenaBonusPerStreak > 0).to.equal(true)
+		end)
 	end)
 end

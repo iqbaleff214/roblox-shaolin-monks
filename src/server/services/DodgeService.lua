@@ -25,10 +25,16 @@ local DodgeService = Knit.CreateService({
 
 local machinesByPlayer: { [Player]: DodgeStateMachine.DodgeStateMachine } = {}
 
+local MIN_DODGE_COOLDOWN = 0.1 -- seconds; floor so DodgeCooldownReduction can never enable spam-dodge i-frames
+
 local function getMachine(player: Player): DodgeStateMachine.DodgeStateMachine
 	local machine = machinesByPlayer[player]
 	if not machine then
-		machine = DodgeStateMachine.new(DodgeConfig.DodgeIFrames, DodgeConfig.DodgeCooldown)
+		-- T-091: SkillTreeService's DodgeCooldownReduction node sets this
+		-- attribute (a negative seconds value).
+		local cooldownBonus = player:GetAttribute("DodgeCooldownBonus")
+		local cooldown = DodgeConfig.DodgeCooldown + (if type(cooldownBonus) == "number" then cooldownBonus else 0)
+		machine = DodgeStateMachine.new(DodgeConfig.DodgeIFrames, math.max(cooldown, MIN_DODGE_COOLDOWN))
 		machinesByPlayer[player] = machine
 	end
 	return machine
