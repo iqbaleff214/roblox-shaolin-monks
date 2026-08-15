@@ -584,14 +584,14 @@ Each config module is pure data (no side effects), matching the example shapes i
 **Description:** SFX playback pooling (avoids sound-instance spam), music stem layering (combat vs. exploration swap on arena-gate-seal, §16), per-chapter ambient loop switching.
 **DoD / Expected Output:** Combat music stem swap is driven by the same gate-seal/unseal events as T-131's HUD expansion (single source of truth for "in combat" state).
 **Test Case:** Integration test: seal an arena gate, assert combat music stem activates within one beat/measure boundary (not an abrupt cut).
-- [ ] Done
+- [x] Done
 
 #### T-141 — Volume settings hookup
 **Depends on:** T-140, T-134
 **Description:** Independent music/SFX sliders; no audio autoplay on the Roblox game page (policy compliance, §16).
 **DoD / Expected Output:** Volume changes apply to already-playing sounds immediately, not only newly-started ones.
 **Test Case:** Integration test: start a looping ambient sound, change the SFX/music slider, assert the live sound's volume updates without restart.
-- [ ] Done
+- [x] Done
 
 ---
 

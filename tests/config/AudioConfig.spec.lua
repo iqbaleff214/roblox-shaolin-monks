@@ -54,6 +54,10 @@ return function()
 			end
 		end)
 
+		it("should define a positive MusicCrossfadeDuration (T-140)", function()
+			expect(AudioConfig.MusicCrossfadeDuration > 0).to.equal(true)
+		end)
+
 		it("should not define music/ambient for a chapter Id that doesn't exist in ChapterConfig (drift guard)", function()
 			local validIds = {}
 			for _, chapter in ChapterConfig do

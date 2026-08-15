@@ -65,6 +65,7 @@ local function buildScreen(gui: ScreenGui, state: string)
 		backButton.Parent = frame
 
 		backButton.Activated:Connect(function()
+			Knit.GetController("AudioController"):PlaySfx("UIClick")
 			if stateMachine:back() then
 				showCurrentState()
 			end
@@ -85,6 +86,7 @@ local function buildScreen(gui: ScreenGui, state: string)
 		nextButton.Parent = frame
 
 		nextButton.Activated:Connect(function()
+			Knit.GetController("AudioController"):PlaySfx("UIClick")
 			if stateMachine:advance() then
 				showCurrentState()
 			end

@@ -26,6 +26,8 @@ local FeedbackFXService = Knit.CreateService({
 		FinishingMoveOverlay = Knit.CreateSignal(), -- (target: Model)
 		BossPhaseFlash = Knit.CreateSignal(), -- (target: Model)
 		ContainerBreakPopup = Knit.CreateSignal(), -- (containerType: string)
+		EnemyHitFX = Knit.CreateSignal(), -- (target: Model) — T-140: AudioController's EnemyHit SFX
+		EnemyDeathFX = Knit.CreateSignal(), -- (target: Model) — T-140: AudioController's EnemyDeath SFX
 	},
 })
 
@@ -45,10 +47,20 @@ local function onContainerBroken(_instance: Instance, containerType: string, _pl
 	FeedbackFXService.Client.ContainerBreakPopup:FireAll(containerType)
 end
 
+local function onEnemyDamaged(target: Model, _amount: number, _player: Player?)
+	FeedbackFXService.Client.EnemyHitFX:FireAll(target)
+end
+
+local function onEnemyDefeated(target: Model, _player: Player?)
+	FeedbackFXService.Client.EnemyDeathFX:FireAll(target)
+end
+
 function FeedbackFXService:KnitStart()
 	local CombatService = Knit.GetService("CombatService")
 	CombatService.HeavyAttackLanded:Connect(onHeavyAttackLanded)
 	CombatService.FinishingMoveLanded:Connect(onFinishingMoveLanded)
+	CombatService.EnemyDamaged:Connect(onEnemyDamaged)
+	CombatService.EnemyDefeated:Connect(onEnemyDefeated)
 
 	local EnemyController = Knit.GetService("EnemyController")
 	EnemyController.BossPhaseTransition:Connect(onBossPhaseTransition)

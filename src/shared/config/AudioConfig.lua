@@ -39,6 +39,11 @@ local AudioConfig = {
 
 	-- §16: per-chapter ambient loop (temple wind, village fire crackle, etc.)
 	Ambient = {},
+
+	-- T-140: crossfade duration for every music/ambient stem swap (Lobby <->
+	-- chapter, Exploration <-> Combat) — satisfies the "not an abrupt cut"
+	-- DoD as a tunable constant rather than a hardcoded tween time.
+	MusicCrossfadeDuration = 0.5,
 }
 
 for _, chapterId in CHAPTER_IDS do
