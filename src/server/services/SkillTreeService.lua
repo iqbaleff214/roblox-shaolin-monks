@@ -81,6 +81,9 @@ local function applyNodeEffect(player: Player, node: string, rank: number)
 end
 
 function SkillTreeService.Client:RequestPurchaseNode(player: Player, node: string): boolean
+	if not Knit.GetService("RateLimitService"):TryConsume(player, "SkillTreeService.RequestPurchaseNode") then
+		return false
+	end
 	local cost = ProgressionConfig.SkillPoints.NodeCosts[node]
 	if not cost then
 		return false

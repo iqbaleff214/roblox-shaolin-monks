@@ -118,6 +118,9 @@ function WeaponPickupService.Client:RequestPickup(player: Player): boolean
 end
 
 function WeaponPickupService.Client:RequestSecondaryAttack(player: Player): boolean
+	if not Knit.GetService("RateLimitService"):TryConsume(player, "WeaponPickupService.RequestSecondaryAttack") then
+		return false
+	end
 	local state = secondaryWeapons[player]
 	local character = player.Character
 	local rootPart = character and character:FindFirstChild("HumanoidRootPart") :: BasePart?
@@ -153,6 +156,9 @@ function WeaponPickupService.Client:RequestSecondaryAttack(player: Player): bool
 end
 
 function WeaponPickupService.Client:RequestThrowSecondary(player: Player, direction: Vector3): boolean
+	if not Knit.GetService("RateLimitService"):TryConsume(player, "WeaponPickupService.RequestThrowSecondary") then
+		return false
+	end
 	local state = secondaryWeapons[player]
 	local character = player.Character
 	local rootPart = character and character:FindFirstChild("HumanoidRootPart") :: BasePart?

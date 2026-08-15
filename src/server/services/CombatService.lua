@@ -345,6 +345,10 @@ end
 --// Client-facing API \\--
 
 function CombatService.Client:RequestAttack(player: Player, isHeavy: boolean)
+	if not Knit.GetService("RateLimitService"):TryConsume(player, "CombatService.RequestAttack") then
+		return { hits = 0, comboCount = 0 }
+	end
+
 	local character = player.Character
 	local rootPart = character and character:FindFirstChild("HumanoidRootPart") :: BasePart?
 	if not rootPart then
@@ -401,6 +405,10 @@ function CombatService.Client:SetBlocking(player: Player, isBlocking: boolean)
 end
 
 function CombatService.Client:RequestFinishingMove(player: Player, target: Model): boolean
+	if not Knit.GetService("RateLimitService"):TryConsume(player, "CombatService.RequestFinishingMove") then
+		return false
+	end
+
 	local character = player.Character
 	local rootPart = character and character:FindFirstChild("HumanoidRootPart") :: BasePart?
 	local enemyState = enemyStates[target]
@@ -434,6 +442,10 @@ function CombatService.Client:RequestFinishingMove(player: Player, target: Model
 end
 
 function CombatService.Client:RequestUltimate(player: Player): boolean
+	if not Knit.GetService("RateLimitService"):TryConsume(player, "CombatService.RequestUltimate") then
+		return false
+	end
+
 	local state = getPlayerState(player)
 	if not state.chi:tryActivate() then
 		return false

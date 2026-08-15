@@ -83,6 +83,9 @@ end
 --// Client-facing API \\--
 
 function GrappleService.Client:RequestGrab(player: Player): boolean
+	if not Knit.GetService("RateLimitService"):TryConsume(player, "GrappleService.RequestGrab") then
+		return false
+	end
 	if grabsByPlayer[player] then
 		return false -- already holding something
 	end
@@ -106,6 +109,9 @@ function GrappleService.Client:RequestGrab(player: Player): boolean
 end
 
 function GrappleService.Client:RequestThrow(player: Player, direction: Vector3): boolean
+	if not Knit.GetService("RateLimitService"):TryConsume(player, "GrappleService.RequestThrow") then
+		return false
+	end
 	local grab = grabsByPlayer[player]
 	local character = player.Character
 	local rootPart = character and character:FindFirstChild("HumanoidRootPart") :: BasePart?

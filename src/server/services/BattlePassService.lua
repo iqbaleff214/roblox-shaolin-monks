@@ -95,6 +95,9 @@ function BattlePassService.Client:HasPremium(player: Player): boolean
 end
 
 function BattlePassService.Client:RequestClaimReward(player: Player, track: string, tier: number): boolean
+	if not Knit.GetService("RateLimitService"):TryConsume(player, "BattlePassService.RequestClaimReward") then
+		return false
+	end
 	if track ~= "Free" and track ~= "Premium" then
 		return false
 	end

@@ -53,6 +53,9 @@ end
 -- Client-callable: attempts to start a dodge. Returns false if still on
 -- cooldown, in which case the client must not play the roll.
 function DodgeService.Client:RequestDodge(player: Player): boolean
+	if not Knit.GetService("RateLimitService"):TryConsume(player, "DodgeService.RequestDodge") then
+		return false
+	end
 	local machine = getMachine(player)
 	return machine:tryDodge(os.clock())
 end

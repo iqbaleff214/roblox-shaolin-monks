@@ -21,6 +21,7 @@ local Config = {
 	BattlePass = require(script.Parent.config.BattlePassConfig),
 	Party = require(script.Parent.config.PartyConfig),
 	Translations = require(script.Parent.config.TranslationStrings),
+	AntiCheat = require(script.Parent.config.AntiCheatConfig),
 }
 
 return Config

@@ -34,6 +34,9 @@ local function findScroll(scrollId: string)
 end
 
 function ComboScrollShopService.Client:RequestPurchase(player: Player, scrollId: string): boolean
+	if not Knit.GetService("RateLimitService"):TryConsume(player, "ComboScrollShopService.RequestPurchase") then
+		return false
+	end
 	local scroll = findScroll(scrollId)
 	if not scroll then
 		return false

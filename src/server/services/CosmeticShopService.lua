@@ -47,6 +47,9 @@ local function inventoryItemId(entry: { Id: string, AccessoryId: string? })
 end
 
 function CosmeticShopService.Client:RequestPurchase(player: Player, shopItemId: string): boolean
+	if not Knit.GetService("RateLimitService"):TryConsume(player, "CosmeticShopService.RequestPurchase") then
+		return false
+	end
 	local entry = findCosmetic(shopItemId)
 	if not entry then
 		return false
@@ -62,6 +65,9 @@ function CosmeticShopService.Client:RequestPurchase(player: Player, shopItemId: 
 end
 
 function CosmeticShopService.Client:RequestPurchaseBundle(player: Player, bundleId: string): boolean
+	if not Knit.GetService("RateLimitService"):TryConsume(player, "CosmeticShopService.RequestPurchaseBundle") then
+		return false
+	end
 	local bundle = findBundle(bundleId)
 	if not bundle then
 		return false

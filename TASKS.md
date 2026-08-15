@@ -659,14 +659,14 @@ Each config module is pure data (no side effects), matching the example shapes i
 **Description:** Checklist + automated scan confirming no client RemoteEvent can directly mutate Coins/XP/Jade/inventory/chapter-progress without server-side validation (§17.2).
 **DoD / Expected Output:** A written audit checklist (one line per RemoteEvent in the game) with each entry marked as validated; automated test suite covers the highest-risk events (currency, purchases, damage).
 **Test Case:** Integration test suite: for each currency/XP/inventory RemoteEvent, send a malformed/spoofed payload and assert server-side state is unaffected.
-- [ ] Done
+- [x] Done
 
 #### T-171 — RemoteEvent rate-limiting
 **Depends on:** T-000
 **Description:** Sanity-bounds/rate-limits on high-frequency RemoteEvents (attack inputs, purchase requests) to blunt spam-based exploits or accidental client bugs from flooding the server.
 **DoD / Expected Output:** Exceeding the configured rate for a given event drops excess calls server-side without disconnecting the player or breaking legitimate fast-combo play (rate threshold tuned above realistic max input rate).
 **Test Case:** Integration test: fire an event well above the configured rate limit, assert excess calls are dropped and legitimate in-rate calls still succeed.
-- [ ] Done
+- [x] Done
 
 ---
 

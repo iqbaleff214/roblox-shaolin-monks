@@ -60,6 +60,9 @@ local function onChestOpened(player: Player, tier: string, rarity: string)
 end
 
 function CrateOpeningService.Client:RequestPurchaseCrate(player: Player, crateId: string): boolean
+	if not Knit.GetService("RateLimitService"):TryConsume(player, "CrateOpeningService.RequestPurchaseCrate") then
+		return false
+	end
 	local crate = findCrate(crateId)
 	if not crate then
 		return false
