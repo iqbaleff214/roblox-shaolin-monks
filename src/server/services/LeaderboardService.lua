@@ -72,13 +72,28 @@ local function submitToAllScopes(category: string, chapterId: string, userId: nu
 	submitBest(LeaderboardKey.storeName(category, chapterId, "Weekly", currentWeekId()), category, userId, value)
 end
 
+-- T-127: a private server with an active override never counts toward
+-- public leaderboards.
+local function isSubmissionExcluded(): boolean
+	local ok, excluded = pcall(function()
+		return Knit.GetService("PrivateServerSettingsService"):IsOverridden()
+	end)
+	return ok and excluded == true
+end
+
 -- Server-internal: real submission points, awaiting the chapter-clear flow
 -- (Phase 10) as their caller.
 function LeaderboardService:SubmitClearTime(player: Player, chapterId: string, timeSeconds: number)
+	if isSubmissionExcluded() then
+		return
+	end
 	submitToAllScopes("ClearTime", chapterId, player.UserId, math.floor(timeSeconds))
 end
 
 function LeaderboardService:SubmitStyleScore(player: Player, chapterId: string, styleScore: number)
+	if isSubmissionExcluded() then
+		return
+	end
 	submitToAllScopes("StyleScore", chapterId, player.UserId, math.floor(styleScore))
 end
 

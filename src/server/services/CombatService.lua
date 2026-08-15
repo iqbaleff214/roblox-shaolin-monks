@@ -69,6 +69,7 @@ CombatService.UltimateActivated = Signal.new() -- (player: Player, weaponId: str
 CombatService.PlayerDamaged = Signal.new() -- (player: Player, amount: number, source: any)
 CombatService.HeavyHitOnBlockingEnemy = Signal.new() -- (target: Model, player: Player) — §3.5 disarm precondition, WeaponPickupService (T-045) rolls the chance
 CombatService.EnemyStaggered = Signal.new() -- (target: Model, player: Player?) — fires exactly on the hit that crosses the Stagger threshold; EnemyController (T-060/T-065) decides finisher-eligible vs. phase-transition
+CombatService.PlayerFallen = Signal.new() -- (player: Player, source: any) — T-124: fired instead of letting a lethal hit kill the player; ReviveService owns them from here
 
 --// Player combat state \\--
 
@@ -278,14 +279,21 @@ function CombatService:GrantChi(player: Player, amount: number)
 end
 
 -- Server-internal: applies damage to a player, checking dodge invulnerability
--- (T-031) and block/parry mitigation (T-043) first. Not yet called by
--- anything (enemy attacks are Phase 4, T-062/T-063) but is the complete,
--- ready hookup point.
+-- (T-031) and block/parry mitigation (T-043) first. Called by EnemyController
+-- (T-062/T-063, Phase 4) for enemy attacks.
+--
+-- T-124 (Phase 10): a hit that would drop the player to 0 HP instead leaves
+-- them at 1 HP and enters the "Fallen" state (`IsFallen` attribute) rather
+-- than letting Roblox's default Humanoid death/respawn take over — Fallen
+-- players are ReviveService's responsibility from here, not this function's.
 function CombatService:ApplyDamageToPlayer(player: Player, amount: number, impactTime: number, source: any)
 	local character = player.Character
 	local humanoid = character and character:FindFirstChildOfClass("Humanoid")
 	if not humanoid or humanoid.Health <= 0 then
 		return
+	end
+	if player:GetAttribute("IsFallen") == true then
+		return -- already down; ReviveService owns them until revived
 	end
 
 	local DodgeService = Knit.GetService("DodgeService")
@@ -308,7 +316,13 @@ function CombatService:ApplyDamageToPlayer(player: Player, amount: number, impac
 	end
 
 	if finalDamage > 0 then
-		humanoid:TakeDamage(finalDamage)
+		if finalDamage >= humanoid.Health then
+			humanoid.Health = 1
+			player:SetAttribute("IsFallen", true)
+			CombatService.PlayerFallen:Fire(player, source)
+		else
+			humanoid:TakeDamage(finalDamage)
+		end
 		state.chi:gain(CombatConfig.ChiMeter.GainPerHitTaken)
 		state.styleScore:resetCombo() -- getting hit breaks the live combo (§3.7)
 		CombatService.PlayerDamaged:Fire(player, finalDamage, source)

@@ -84,16 +84,39 @@ end
 
 --// Sealing / unsealing (physically collision-blocking, not a soft warning) \\--
 
+-- T-123: prefers PartyService's (T-120) live party size — which shrinks
+-- immediately if a member disconnects mid-run — over the raw playersInside
+-- count, since that set is never pruned on disconnect (see its own comment
+-- below). Falls back to counting still-connected entrants for scenarios
+-- with no tracked party at all (e.g. a bare test arena).
+local function computePartySize(arena: ArenaState): number
+	local representative = next(arena.playersInside)
+	if not representative then
+		return 0
+	end
+
+	local PartyService = Knit.GetService("PartyService")
+	local partySize = PartyService:GetPartySize(representative)
+	if partySize > 0 then
+		return partySize
+	end
+
+	local count = 0
+	for player in arena.playersInside do
+		if player.Parent then
+			count += 1
+		end
+	end
+	return count
+end
+
 local function spawnWave(arena: ArenaState, waveIndex: number)
 	local spawns = arena.wavesByIndex[waveIndex]
 	if not spawns or #spawns == 0 then
 		return
 	end
 
-	local partySize = 0
-	for _ in arena.playersInside do
-		partySize += 1
-	end
+	local partySize = computePartySize(arena)
 
 	local EnemyController = Knit.GetService("EnemyController")
 	local baseCount = #spawns
@@ -257,6 +280,38 @@ function ArenaGateController:HasPlayerEnteredAnyArena(player: Player): boolean
 		end
 	end
 	return false
+end
+
+-- Server-internal: the currently-sealed arena `player` is inside, if any —
+-- T-124's ReviveService uses this to find which arena needs its wave
+-- restarted on a whole-party-down.
+function ArenaGateController:GetArenaIdForPlayer(player: Player): string?
+	for arenaId, arena in arenas do
+		if arena.isSealed and arena.playersInside[player] then
+			return arenaId
+		end
+	end
+	return nil
+end
+
+-- Server-internal: despawns every enemy currently alive in `arenaId`'s wave
+-- and respawns the same wave index fresh — T-124's "whole-party-down
+-- restarts the current wave only, not the chapter" (§12.3).
+function ArenaGateController:RestartCurrentWave(arenaId: string)
+	local arena = arenas[arenaId]
+	if not arena or not arena.isSealed then
+		return
+	end
+
+	local EnemyController = Knit.GetService("EnemyController")
+	for enemy, mappedArenaId in enemyArenaId do
+		if mappedArenaId == arenaId then
+			enemyArenaId[enemy] = nil
+			EnemyController:Despawn(enemy)
+		end
+	end
+
+	spawnWave(arena, arena.currentWaveIndex)
 end
 
 function ArenaGateController:KnitInit()

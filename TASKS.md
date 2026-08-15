@@ -471,56 +471,56 @@ Each config module is pure data (no side effects), matching the example shapes i
 **Description:** Party leader invites up to 3 friends (party of 4 total, §12.2); party state (members, leader, ready status) synced across clients.
 **DoD / Expected Output:** Leader-only actions (kick, start) are rejected server-side if attempted by a non-leader.
 **Test Case:** Integration test: non-leader member attempts to start the chapter, assert rejection; leader attempts same, assert success.
-- [ ] Done
+- [x] Done
 
 #### T-121 — Party teleport to battlefield instance
 **Depends on:** T-120, T-013
 **Description:** Teleports the full party together into a reserved server for the selected chapter (§12.2); solo players may also launch alone or matchmake into an open party.
 **DoD / Expected Output:** All party members land in the same server instance, or the teleport is retried/rolled back for the whole party (no partial-party splits).
 **Test Case:** Integration test: simulate a mid-teleport failure for one member, assert the system either retries or returns the whole party to Lobby rather than leaving them split.
-- [ ] Done
+- [x] Done
 
 #### T-122 — Party chat channel persistence
 **Depends on:** T-120
 **Description:** Party chat channel persists across chapter loads/teleports (§12.2).
 **DoD / Expected Output:** Chat history/channel membership survives a teleport without requiring players to re-join manually.
 **Test Case:** Integration test: send a party chat message, teleport, assert channel is still active without a rejoin action.
-- [ ] Done
+- [x] Done
 
 #### T-123 — Solo/co-op difficulty scaling hook
 **Depends on:** T-064, T-120
 **Description:** Exposes current party size to the wave-composition scaler (T-064) so difficulty scales consistently (§4.3, §12.2).
 **DoD / Expected Output:** Party-size changes mid-run (a member disconnects) re-scale future waves in the same arena, not just future arenas.
 **Test Case:** Integration test: start a 4-player arena, drop to 2 players mid-arena, assert the next wave in that arena scales for 2, not 4.
-- [ ] Done
+- [x] Done
 
 #### T-124 — Revive system
 **Depends on:** T-049, T-120
 **Description:** Downed players enter "Fallen" state, revivable by a nearby teammate (short animation, vulnerable during, §12.3); whole-party-down restarts the current wave only, not the chapter.
 **DoD / Expected Output:** Reviver is vulnerable to interruption (taking damage during revive cancels it) per the "vulnerable during" design note.
 **Test Case:** Integration test: start a revive, damage the reviver mid-animation, assert revive is cancelled and target remains Fallen.
-- [ ] Done
+- [x] Done
 
 #### T-125 — Social hook broadcasts
 **Depends on:** T-046, T-048, T-065
 **Description:** "FINISH!" callout to nearby teammates, party-wide Flawless banner, hub-wide boss-defeat announcement + fireworks (§12.4).
 **DoD / Expected Output:** Hub-wide announcements only reach players currently in the Lobby server (§12.4 explicit scope), not a global cross-server broadcast.
 **Test Case:** Integration test: trigger a boss defeat, assert the announcement event fires only to Lobby-server-connected clients.
-- [ ] Done
+- [x] Done
 
 #### T-126 — NPC vendor interaction framework
 **Depends on:** T-000, S-012, S-013, S-014
 **Description:** Generic dialog/purchase-menu trigger system for tagged `NPCVendor` instances (Sifu's Dojo, Cosmetic Shop stall, Battle Pass board), routing to the correct shop UI (T-064/T-134 style) per vendor type attribute.
 **DoD / Expected Output:** Adding a new vendor in Studio (tag + attribute) requires no new script — purely config/attribute driven.
 **Test Case:** Integration test: interact with each tagged vendor type, assert the correct shop menu opens.
-- [ ] Done
+- [x] Done
 
 #### T-127 — Private server settings
 **Depends on:** T-013, T-064
 **Description:** Host-configurable chapter selection, difficulty-scaling override, and cosmetic-only "mirror match" dummy settings for private servers (§12.5).
 **DoD / Expected Output:** Overrides apply only within that private server instance and never affect public matchmaking pools or leaderboard eligibility (a private-server run should not silently count toward weekly leaderboards if difficulty was overridden — flag and exclude such runs).
 **Test Case:** Integration test: run a chapter with an overridden difficulty in a private server, assert the resulting score is excluded from leaderboard submission.
-- [ ] Done
+- [x] Done
 
 ---
 

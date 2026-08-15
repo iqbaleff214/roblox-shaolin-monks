@@ -19,6 +19,7 @@ local Config = {
 	Localization = require(script.Parent.config.LocalizationConfig),
 	Quest = require(script.Parent.config.QuestConfig),
 	BattlePass = require(script.Parent.config.BattlePassConfig),
+	Party = require(script.Parent.config.PartyConfig),
 }
 
 return Config

@@ -72,4 +72,12 @@ return {
 		MeleeDamage = 10, -- flat damage per swing while holding a secondary weapon
 		MeleeSwings = 3, -- "short combo" (§3.5) — a fixed number of swings before it's spent
 	},
+
+	-- §12.3: a hit that would kill a player instead leaves them Fallen at 1 HP
+	-- for a nearby teammate to revive.
+	Revive = {
+		Range = 6, -- studs, how close a reviver must be to a Fallen teammate
+		Duration = 3, -- seconds the revive channel takes
+		HealthRestoreFraction = 0.5, -- fraction of MaxHealth restored on a successful revive
+	},
 }

@@ -12,6 +12,7 @@ local EXPECTED_SHAPE = {
 	Disarm = { "ChanceOnHeavyVsBlocking", "VulnerableDuration" },
 	Grapple = { "ThrowDamage", "HumanShieldHitCapacity" },
 	WeaponPickup = { "ThrowDamage", "MeleeDamage", "MeleeSwings" },
+	Revive = { "Range", "Duration", "HealthRestoreFraction" },
 }
 
 -- §3.1 Movement is nested (sub-tables per mechanic), so it's checked
@@ -31,7 +32,7 @@ end
 
 return function()
 	describe("CombatConfig", function()
-		it("should expose exactly Attacks, Poise, ChiMeter, Movement, Disarm, Grapple, and WeaponPickup", function()
+		it("should expose exactly Attacks, Poise, ChiMeter, Movement, Disarm, Grapple, WeaponPickup, and Revive", function()
 			local seen = {}
 			for key in CombatConfig do
 				seen[key] = true
@@ -43,12 +44,13 @@ return function()
 			expect(seen.Disarm).to.equal(true)
 			expect(seen.Grapple).to.equal(true)
 			expect(seen.WeaponPickup).to.equal(true)
+			expect(seen.Revive).to.equal(true)
 
 			local count = 0
 			for _ in CombatConfig do
 				count += 1
 			end
-			expect(count).to.equal(7)
+			expect(count).to.equal(8)
 		end)
 
 		it("should match the exact field set for each subtable (typo/rename guard)", function()
@@ -81,6 +83,11 @@ return function()
 		it("should keep block damage reduction a valid fraction (§3.3)", function()
 			expect(CombatConfig.Attacks.BlockDamageReduction >= 0).to.equal(true)
 			expect(CombatConfig.Attacks.BlockDamageReduction <= 1).to.equal(true)
+		end)
+
+		it("should keep Revive.HealthRestoreFraction a valid fraction (§12.3)", function()
+			expect(CombatConfig.Revive.HealthRestoreFraction > 0).to.equal(true)
+			expect(CombatConfig.Revive.HealthRestoreFraction <= 1).to.equal(true)
 		end)
 
 		it("should match the exact top-level field set for Movement (typo/rename guard)", function()
