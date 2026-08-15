@@ -51,5 +51,17 @@ return function()
 				previousGlow, previousDensity = tier.GlowIntensity, tier.ParticleDensity
 			end
 		end)
+
+		it("should keep HitStopDuration within §18's documented ~0.05-0.08s range", function()
+			local duration = UIConfig.FeedbackTimings.HitStopDuration
+			expect(duration >= 0.05 and duration <= 0.08).to.equal(true)
+		end)
+
+		it("should give every FeedbackTimings entry a strictly positive duration", function()
+			for _, duration in UIConfig.FeedbackTimings do
+				expect(type(duration)).to.equal("number")
+				expect(duration > 0).to.equal(true)
+			end
+		end)
 	end)
 end

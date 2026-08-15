@@ -531,49 +531,49 @@ Each config module is pure data (no side effects), matching the example shapes i
 **Description:** Detects PC/mobile/console input at runtime and switches active control bindings + on-screen prompts accordingly (§6).
 **DoD / Expected Output:** Switching input device mid-session (e.g. plugging in a gamepad) live-updates prompts without requiring a rejoin.
 **Test Case:** Integration test: simulate an input-type change event, assert control prompt UI updates within one frame.
-- [ ] Done
+- [x] Done
 
 #### T-131 — Combat HUD controller
 **Depends on:** T-046, T-047, T-048, S-060
 **Description:** Logic layer binding live HP/Chi/Combo/party-frame data to the Studio-built ScreenGui (S-060) per the §15.1 mockup.
 **DoD / Expected Output:** HUD stays minimal outside combat and expands (combo counter, party HP bars) exactly on arena-gate-seal (T-061 hookup), not on a fixed timer.
 **Test Case:** Integration test: enter an arena, assert HUD expansion event fires in sync with the gate-seal event, not before/after.
-- [ ] Done
+- [x] Done
 
 #### T-132 — Responsive layout manager
 **Depends on:** T-020, S-061
 **Description:** Detects viewport size/aspect ratio, applies the correct breakpoint (desktop/tablet/portrait, §15.2) from `UIConfig`, respects safe-area insets on notched devices.
 **DoD / Expected Output:** No UI script hardcodes a pixel offset; all positioning is anchor/scale-based or breakpoint-table-driven.
 **Test Case:** Integration test: simulate 3 representative viewport sizes (ultrawide, standard tablet, narrow portrait), assert the correct breakpoint layout is selected for each.
-- [ ] Done
+- [x] Done
 
 #### T-133 — Menu flow controller
 **Depends on:** S-062
 **Description:** Drives the Lobby → Chapter Select → Party Setup → Loadout Check → Ready → Load flow (§15.3), with back-navigation from every screen.
 **DoD / Expected Output:** No dead-end screen exists — every menu state has a valid back action reachable without a rejoin.
 **Test Case:** Integration test: from every menu state, assert a back-navigation path exists back to Lobby.
-- [ ] Done
+- [x] Done
 
 #### T-134 — Settings menu logic
 **Depends on:** S-063, T-141, T-150
 **Description:** Audio volume (music/SFX separate), control scheme, graphics quality, lock-on assist toggle, language selection (§15.3).
 **DoD / Expected Output:** Settings persist via T-160 and apply immediately without requiring a rejoin/reload.
 **Test Case:** Integration test: change a setting, assert the corresponding live system (e.g. music volume) updates within the same session, and the value survives a simulated relog.
-- [ ] Done
+- [x] Done
 
 #### T-135 — Feedback FX triggers
 **Depends on:** T-046, T-065, T-100, S-065
 **Description:** Hit-stop freeze-frame, Finishing Move overlay, Flawless banner, boss-phase-transition screen flash, container-break popup (§15.4, §18).
 **DoD / Expected Output:** Hit-stop duration and all overlay timings are config-driven (`UIConfig`/`CombatConfig`), matching the specific values noted in §18 (e.g. ~0.05–0.08s hit-stop).
 **Test Case:** Integration test: trigger each feedback event, assert timing/duration matches the configured value within tolerance.
-- [ ] Done
+- [x] Done
 
 #### T-136 — Mobile touch control bindings
 **Depends on:** T-040, S-060
 **Description:** Virtual joystick, attack/block/dodge/grab/ultimate buttons (§6.2); enforces the ≥44px tap-target rule.
 **DoD / Expected Output:** A layout-validation check (can run in Studio or as an automated screenshot/measurement test) confirms every interactive mobile control element meets the 44px minimum at the smallest supported viewport.
 **Test Case:** Integration test: measure rendered size of each mobile control button at the smallest supported breakpoint, assert all are ≥44px.
-- [ ] Done
+- [x] Done
 
 ---
 

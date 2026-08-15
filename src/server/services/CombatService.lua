@@ -57,7 +57,9 @@ local MAX_REWIND_SECONDS = 1 -- clamp on GetNetworkPing-derived rewind, matches 
 
 local CombatService = Knit.CreateService({
 	Name = "CombatService",
-	Client = {},
+	Client = {
+		Chi = Knit.CreateProperty(0), -- T-131 (Phase 11): live per-player Chi meter for the Combat HUD
+	},
 })
 
 -- Server-internal signals. Deliberately not exposed via Client — future
@@ -70,6 +72,7 @@ CombatService.PlayerDamaged = Signal.new() -- (player: Player, amount: number, s
 CombatService.HeavyHitOnBlockingEnemy = Signal.new() -- (target: Model, player: Player) — §3.5 disarm precondition, WeaponPickupService (T-045) rolls the chance
 CombatService.EnemyStaggered = Signal.new() -- (target: Model, player: Player?) — fires exactly on the hit that crosses the Stagger threshold; EnemyController (T-060/T-065) decides finisher-eligible vs. phase-transition
 CombatService.PlayerFallen = Signal.new() -- (player: Player, source: any) — T-124: fired instead of letting a lethal hit kill the player; ReviveService owns them from here
+CombatService.HeavyAttackLanded = Signal.new() -- (target: Model, player: Player) — T-135 (Phase 11): FeedbackFXService relays this for the hit-stop freeze-frame
 
 --// Player combat state \\--
 
@@ -130,7 +133,14 @@ local function getPlayerState(player: Player): PlayerState
 		blockStartedAt = nil :: number?,
 	}
 	playerStates[player] = state
+	CombatService.Client.Chi:SetFor(player, state.chi.value)
 	return state
+end
+
+-- T-131: keeps the HUD's replicated Chi property in sync with the
+-- authoritative server value after every mutation.
+local function syncChi(player: Player, state: PlayerState)
+	CombatService.Client.Chi:SetFor(player, state.chi.value)
 end
 
 --// Enemy target state \\--
@@ -239,6 +249,7 @@ function CombatService:ApplyDamageToEnemy(target: Model, amount: number, player:
 		local playerState = getPlayerState(player)
 		playerState.chi:gain(CombatConfig.ChiMeter.GainPerHitDealt)
 		playerState.styleScore:registerHit(os.clock())
+		syncChi(player, playerState)
 	end
 
 	if humanoid.Health <= 0 then
@@ -276,6 +287,7 @@ end
 function CombatService:GrantChi(player: Player, amount: number)
 	local state = getPlayerState(player)
 	state.chi:gain(amount)
+	syncChi(player, state)
 end
 
 -- Server-internal: applies damage to a player, checking dodge invulnerability
@@ -325,6 +337,7 @@ function CombatService:ApplyDamageToPlayer(player: Player, amount: number, impac
 		end
 		state.chi:gain(CombatConfig.ChiMeter.GainPerHitTaken)
 		state.styleScore:resetCombo() -- getting hit breaks the live combo (§3.7)
+		syncChi(player, state)
 		CombatService.PlayerDamaged:Fire(player, finalDamage, source)
 	end
 end
@@ -362,6 +375,11 @@ function CombatService.Client:RequestAttack(player: Player, isHeavy: boolean)
 			CombatService.HeavyHitOnBlockingEnemy:Fire(hit.target, player)
 		end
 		CombatService:ApplyDamageToEnemy(hit.target, damage, player)
+		if isHeavy then
+			-- T-135 (Phase 11): FeedbackFXService relays this for the
+			-- Heavy Attack hit-stop freeze-frame (§18).
+			CombatService.HeavyAttackLanded:Fire(hit.target, player)
+		end
 	end
 
 	-- T-100 (Phase 8): the same swing also checks nearby destructible
@@ -420,6 +438,7 @@ function CombatService.Client:RequestUltimate(player: Player): boolean
 	if not state.chi:tryActivate() then
 		return false
 	end
+	syncChi(player, state)
 	local weapon = WeaponConfig.Weapons[state.weaponId]
 	CombatService.UltimateActivated:Fire(player, state.weaponId, weapon.Ultimate)
 	return true

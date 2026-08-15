@@ -25,6 +25,10 @@ local WAVE_SPAWN_DELAY = 2 -- seconds "beat" between a wave clearing and the nex
 
 local ArenaGateController = Knit.CreateService({
 	Name = "ArenaGateController",
+	Client = {
+		GateSealed = Knit.CreateSignal(), -- () — T-131 (Phase 11): HUD expands exactly on this, not a fixed timer
+		GateUnsealed = Knit.CreateSignal(), -- ()
+	},
 })
 
 ArenaGateController.ArenaCleared = Signal.new() -- (arenaId: string, centerPosition: Vector3)
@@ -151,6 +155,9 @@ local function sealArena(arena: ArenaState)
 		gate.CanCollide = true
 		gate.Transparency = 0
 	end
+	for player in arena.playersInside do
+		ArenaGateController.Client.GateSealed:Fire(player)
+	end
 
 	arena.currentWaveIndex = 1
 	spawnWave(arena, 1)
@@ -161,6 +168,9 @@ local function unsealArena(arena: ArenaState)
 	for _, gate in arena.gates do
 		gate.CanCollide = false
 		gate.Transparency = 0.6
+	end
+	for player in arena.playersInside do
+		ArenaGateController.Client.GateUnsealed:Fire(player)
 	end
 end
 

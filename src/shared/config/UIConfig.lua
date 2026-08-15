@@ -60,4 +60,13 @@ return {
 		Epic = { GlowIntensity = 0.6, ParticleDensity = 3 },
 		Legendary = { GlowIntensity = 1, ParticleDensity = 5 },
 	},
+
+	-- T-135 (§15.4/§18). Every feedback FX trigger's on-screen duration.
+	FeedbackTimings = {
+		HitStopDuration = 0.065, -- seconds; §18 "~0.05-0.08s" on Heavy Attack/Finishing Move impacts
+		FinishingMoveOverlayDuration = 1.5,
+		BossPhaseFlashDuration = 0.5,
+		ContainerPopupDuration = 1,
+		FlawlessBannerDuration = 3,
+	},
 }

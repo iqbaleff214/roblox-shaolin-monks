@@ -23,6 +23,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 
 local Knit = require(ReplicatedStorage.Packages.Knit)
+local Signal = require(ReplicatedStorage.Packages.Signal)
 local ConfigService = require(ReplicatedStorage.Shared.ConfigService)
 local EnemyStateMachine = require(ReplicatedStorage.Shared.modules.EnemyStateMachine)
 local BossPhaseTracker = require(ReplicatedStorage.Shared.modules.BossPhaseTracker)
@@ -34,6 +35,10 @@ local DEFAULT_POOL_ID = "__unassigned__" -- attacker-token pool for enemies spaw
 local EnemyController = Knit.CreateService({
 	Name = "EnemyController",
 })
+
+-- (target: Model) — T-135 (Phase 11): FeedbackFXService relays this to
+-- nearby clients for the boss-phase-transition screen flash (§15.4/§18).
+EnemyController.BossPhaseTransition = Signal.new()
 
 type EnemyRecord = {
 	role: string,
@@ -163,6 +168,7 @@ local function onEnemyDamaged(target: Model, _amount: number, _player: Player?)
 	target:SetAttribute("IsInvulnerable", true)
 	tracker:openCounterWindow(now, EnemyConfig.Boss.CounterWindowDuration)
 	tracker:openParryPunishWindow(now, EnemyConfig.Boss.ParryPunishWindowDuration)
+	EnemyController.BossPhaseTransition:Fire(target)
 
 	task.delay(EnemyConfig.Boss.PhaseTransitionInvulnerableDuration, function()
 		if enemies[target] ~= record then
