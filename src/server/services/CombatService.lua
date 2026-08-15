@@ -251,6 +251,13 @@ function CombatService:IsStaggered(target: Model): boolean
 	return state ~= nil and state.poise.isStaggered
 end
 
+-- Server-internal: grants bonus Chi outside normal combat gain (e.g. a Chi
+-- Orb pickup, T-101/Phase 8). Clamped by the player's ChiMeterState cap.
+function CombatService:GrantChi(player: Player, amount: number)
+	local state = getPlayerState(player)
+	state.chi:gain(amount)
+end
+
 -- Server-internal: applies damage to a player, checking dodge invulnerability
 -- (T-031) and block/parry mitigation (T-043) first. Not yet called by
 -- anything (enemy attacks are Phase 4, T-062/T-063) but is the complete,
@@ -323,6 +330,11 @@ function CombatService.Client:RequestAttack(player: Player, isHeavy: boolean)
 		end
 		CombatService:ApplyDamageToEnemy(hit.target, damage, player)
 	end
+
+	-- T-100 (Phase 8): the same swing also checks nearby destructible
+	-- containers, using the attacker's live (non-rewound) position — unlike
+	-- enemies, containers don't move, so no lag-compensation rewind is needed.
+	Knit.GetService("DestructibleContainerService"):CheckHits(rootPart.Position, rootPart.CFrame.LookVector, weapon, player)
 
 	return { hits = #targets, comboCount = state.styleScore.comboCounter }
 end

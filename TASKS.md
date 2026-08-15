@@ -379,28 +379,28 @@ Each config module is pure data (no side effects), matching the example shapes i
 **Description:** Tag-driven (`DestructibleContainer`) component reading `Hits`/`DropTable` attributes (per container type in §10.2); breaks after N hits, respawns only on a fresh map instance (never mid-run, per §3.8).
 **DoD / Expected Output:** One generic component handles all 4 container types (Wooden Crate/Clay Urn/Supply Barrel/Jade Chest) purely via attributes — no per-type script forking.
 **Test Case:** Integration test: hit a tagged container the configured number of times, assert it breaks exactly on the last hit (not before/after) and does not respawn within the same run.
-- [ ] Done
+- [x] Done
 
 #### T-101 — Drop table roller
 **Depends on:** T-014, T-100
 **Description:** Server-seeded RNG roll (per-instance seed, per §17.5) consuming `LootConfig` drop tables on container break / enemy kill.
 **DoD / Expected Output:** Roll outcomes are logged with the instance seed for anti-cheat auditing (§17.5), and are reproducible given the same seed (supports the Daily Relic Hunt shared-seed requirement, §7.4).
 **Test Case:** Integration test: roll the same seed twice, assert identical output sequence.
-- [ ] Done
+- [x] Done
 
 #### T-102 — Chest system (Arena/Chapter/Boss/Vault)
 **Depends on:** T-014, T-061
 **Description:** Spawns the appropriate chest tier on arena clear / chapter complete / boss defeat / hidden-vault discovery, rolling rarity per §10.4's weight tables.
 **DoD / Expected Output:** Chest rarity distribution over a large sample (e.g. 10,000 simulated rolls) matches the published weights within statistical tolerance.
 **Test Case:** Integration/statistical test: run 10,000 simulated Arena Chest rolls, assert observed rarity frequencies are within ~2% of the 60/25/10/4/1 table.
-- [ ] Done
+- [x] Done
 
 #### T-103 — Duplicate-protection conversion logic
 **Depends on:** T-081, T-102
 **Description:** Converts duplicate cosmetic pulls to Coins at a fixed rate (§10.4, §11.6) instead of granting a second copy.
 **DoD / Expected Output:** Conversion rate is config-driven (in `ShopConfig` or `LootConfig`), not hardcoded inline.
 **Test Case:** Integration test: grant an already-owned cosmetic via a chest roll, assert Coins increase by the configured rate and inventory count for that item does not change.
-- [ ] Done
+- [x] Done
 
 ---
 
