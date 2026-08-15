@@ -230,49 +230,49 @@ Each config module is pure data (no side effects), matching the example shapes i
 **Description:** Server-side state machine (Idle → Aggro → Circling → Attacking → Staggered → Dead) shared by all enemy roles; role-specific behavior (T-062) plugs into this via config, not by forking the state machine.
 **DoD / Expected Output:** One controller module handles all 7 roles + reskins purely through `EnemyConfig.Roles` data — no per-faction code duplication (faction reskins are asset-only, per S-031).
 **Test Case:** Integration test: spawn a Grunt and a Heavy from the same controller with different config, assert distinct Health/Damage/Poise values are respected.
-- [ ] Done
+- [x] Done
 
 #### T-061 — Arena Gate controller
 **Depends on:** T-000, S-002
 **Description:** Tag-driven (`ArenaGate` + `ArenaSpawnPoint`) system: seals gates on party entry, sequences wave spawns (next wave a beat after previous clears, §4.1), unseals and spawns loot chest on full clear.
 **DoD / Expected Output:** No retreat possible while sealed (gate is physically/collision blocking, not just a soft warning); multi-wave arenas never spawn wave N+1 before wave N is fully cleared.
 **Test Case:** Integration test: enter a test arena, verify gate collision engages, kill all wave-1 enemies, assert wave-2 spawns only after a short delay and gate stays sealed until wave-2 also clears.
-- [ ] Done
+- [x] Done
 
 #### T-062 — Enemy role behaviors (data-driven)
 **Depends on:** T-060, T-012
 **Description:** Implements behavior differences for Grunt/Soldier(blocks)/Heavy(armored, high poise)/Ranged(kites, projectiles)/Assassin(flanks, dodges)/Elite(expanded moveset + Ultimate-style attack)/Boss(multi-phase, hands off to T-065).
 **DoD / Expected Output:** Soldier blocks incoming attacks (requiring Heavy Attack or Disarm per §4.2); Ranged maintains `AttackRange` distance instead of closing to melee; Assassin's `MoveSpeedMult` is reflected in actual movement speed.
 **Test Case:** Integration test per role: verify the one distinguishing behavior listed in the GDD §4.2 table actually manifests (e.g., a Soldier's block reduces incoming Light Attack damage to near-zero until disarmed).
-- [ ] Done
+- [x] Done
 
 #### T-063 — Attack telegraph system
 **Depends on:** T-060
 **Description:** Windup flash/audio cue fires `AttackTelegraph` seconds before an enemy's hit lands (§4.4), giving players a fair reaction window.
 **DoD / Expected Output:** Telegraph timing is config-driven (not hardcoded per animation), so tuning `EnemyConfig.AttackTelegraph` changes all enemies uniformly.
 **Test Case:** Integration test: trigger an enemy attack, measure elapsed time between telegraph event and hit-resolution event, assert it matches config within a small tolerance.
-- [ ] Done
+- [x] Done
 
 #### T-064 — Wave composition & difficulty scaling
 **Depends on:** T-012, T-013, T-123
 **Description:** Wave enemy count/mix scales by chapter `ChapterConfig` difficulty tier and current party size (§4.3, §12.3 hookup) so solo and full-party runs feel equivalently challenging.
 **DoD / Expected Output:** A solo run and a 4-player run of the same arena produce different total enemy HP/count but a comparable per-player difficulty curve (documented scaling formula, not ad hoc per-arena tuning).
 **Test Case:** Integration test: request wave composition for the same arena at party size 1 and 4, assert scaling formula output matches expected values.
-- [ ] Done
+- [x] Done
 
 #### T-065 — Boss phase-transition system
 **Depends on:** T-046, T-062
 **Description:** Splits boss HP into phases (typically 3, §4.5); crossing a threshold triggers a brief invulnerable transition (no damage accepted), then a moveset/environment change; each phase exposes one grab-counter window and one parry-punish window.
 **DoD / Expected Output:** Elite Champions reuse this same module with a single-phase configuration (per §4.5's "condensed 1-phase version" rule) rather than a separate implementation.
 **Test Case:** Integration test: damage a test boss down to a phase threshold, assert a brief invulnerability window is honored (over-damage during transition is not applied) before phase-2 behavior activates.
-- [ ] Done
+- [x] Done
 
 #### T-066 — Enemy spawn/despawn pooling
 **Depends on:** T-060
 **Description:** Object-pools enemy instances per arena to avoid Instance-creation spikes during wave spawns, supporting the §17.4 performance targets.
 **DoD / Expected Output:** Repeated arena clears in a single session (Practice Mode replay, §7.2) do not leak un-despawned enemy instances.
 **Test Case:** Integration test: clear the same arena 5 times in a loop, assert live enemy-instance count returns to 0 after each clear and memory/instance count doesn't grow monotonically.
-- [ ] Done
+- [x] Done
 
 ---
 

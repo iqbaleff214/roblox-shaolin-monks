@@ -34,7 +34,7 @@ Derived from `GDD.md` (v0.1, 2026-08-14). This file covers everything that must 
 | Tag | Applies to | Required Attributes | Consumed by |
 |---|---|---|---|
 | `ArenaGate` | Gate part(s) sealing an arena | `ArenaId` (string) | T-061 |
-| `ArenaSpawnPoint` | Enemy spawn markers inside an arena | `ArenaId`, `WaveIndex` (int) | T-061, T-064 |
+| `ArenaSpawnPoint` | Enemy spawn markers inside an arena | `ArenaId`, `WaveIndex` (int), `Role` (string, matches an `EnemyConfig.Roles` key — declares what spawns here, per §4.6 the faction reskin is an asset swap over the same role) | T-061, T-064 |
 | `Enemy` | Any enemy Model (Grunt/Soldier/Heavy/Ranged/Assassin/Elite/Boss) | `Role` (string, matches an `EnemyConfig.Roles` key), `IsBlocking` (bool, optional — set live by role AI, e.g. Soldier) | T-042, T-044, T-045, T-046, T-050, T-060, T-062 |
 | `DestructibleContainer` | Wooden Crate / Clay Urn / Supply Barrel / Jade Chest models | `ContainerType` (string: `WoodenCrate`\|`ClayUrn`\|`SupplyBarrel`\|`JadeChest`) | T-100 |
 | `HazardZone` | Spikes, fire pits, chasms, temple bells, etc. | `HazardType` (string) | T-044 |

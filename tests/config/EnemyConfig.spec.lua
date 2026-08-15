@@ -40,5 +40,30 @@ return function()
 			expect(EnemyConfig.Roles.Soldier.Blocks).to.equal(true)
 			expect(EnemyConfig.Roles.Boss.Phases).to.equal(3)
 		end)
+
+		it("should give every AI timing/movement value a strictly positive number (§4.3/§4.4)", function()
+			expect(EnemyConfig.AttackCooldown > 0).to.equal(true)
+			expect(EnemyConfig.CirclingRadius > 0).to.equal(true)
+			expect(EnemyConfig.CirclingSpeed > 0).to.equal(true)
+			expect(EnemyConfig.StaggerRecoveryDuration > 0).to.equal(true)
+		end)
+
+		it("should give the Boss phase-transition tuning table exactly its 3 fields, all positive (§4.5)", function()
+			local expectedKeys = { "PhaseTransitionInvulnerableDuration", "CounterWindowDuration", "ParryPunishWindowDuration" }
+			local seen = {}
+			for key, value in EnemyConfig.Boss do
+				seen[key] = true
+				expect(type(value)).to.equal("number")
+				expect(value > 0).to.equal(true)
+			end
+			for _, key in expectedKeys do
+				expect(seen[key]).to.equal(true)
+			end
+			local count = 0
+			for _ in EnemyConfig.Boss do
+				count += 1
+			end
+			expect(count).to.equal(#expectedKeys)
+		end)
 	end)
 end

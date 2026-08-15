@@ -6,6 +6,24 @@ return {
 	ConcurrentAttackerCap = 3, -- §4.3/§4.4: only 2-3 enemies attack at once
 	AggroRadius = 24, -- studs
 	AttackTelegraph = 0.4, -- seconds of windup before a hit lands
+	AttackCooldown = 1.5, -- §4.4: seconds between one enemy's own attacks
+
+	-- §4.3 "ring" behavior: enemies without an attacker token orbit the
+	-- player at this radius/speed instead of idling.
+	CirclingRadius = 10, -- studs
+	CirclingSpeed = 6, -- studs/s
+
+	-- §3.9: a non-boss Staggered enemy that never receives a Finishing Move
+	-- recovers on its own after this long, rather than freezing forever.
+	StaggerRecoveryDuration = 4, -- seconds
+
+	-- §4.5: boss/Elite phase-transition tuning, shared by both (Elites use a
+	-- condensed 1-phase configuration of the same mechanism).
+	Boss = {
+		PhaseTransitionInvulnerableDuration = 2, -- seconds, no damage accepted mid-transition
+		CounterWindowDuration = 1, -- seconds the grab-counter window stays open per phase
+		ParryPunishWindowDuration = 1, -- seconds the parry-punish window stays open per phase
+	},
 
 	Roles = {
 		Grunt = { Health = 40, Damage = 6, Poise = 20 },

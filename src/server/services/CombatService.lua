@@ -67,6 +67,7 @@ CombatService.FinishingMoveLanded = Signal.new() -- (target: Model, player: Play
 CombatService.UltimateActivated = Signal.new() -- (player: Player, weaponId: string, ultimateData: {any})
 CombatService.PlayerDamaged = Signal.new() -- (player: Player, amount: number, source: any)
 CombatService.HeavyHitOnBlockingEnemy = Signal.new() -- (target: Model, player: Player) — §3.5 disarm precondition, WeaponPickupService (T-045) rolls the chance
+CombatService.EnemyStaggered = Signal.new() -- (target: Model, player: Player?) — fires exactly on the hit that crosses the Stagger threshold; EnemyController (T-060/T-065) decides finisher-eligible vs. phase-transition
 
 --// Player combat state \\--
 
@@ -190,6 +191,11 @@ function CombatService:ApplyDamageToEnemy(target: Model, amount: number, player:
 	if not state or not humanoid or humanoid.Health <= 0 then
 		return
 	end
+	if target:GetAttribute("IsInvulnerable") == true then
+		-- §4.5: no damage accepted during a boss/Elite phase-transition
+		-- window. EnemyController (T-065) sets this attribute.
+		return
+	end
 
 	local mitigated = amount
 	if target:GetAttribute("IsBlocking") == true then
@@ -200,7 +206,7 @@ function CombatService:ApplyDamageToEnemy(target: Model, amount: number, player:
 	-- Poise damage mirrors dealt damage — GDD doesn't specify a separate
 	-- curve, and reusing the damage number avoids introducing an unrelated
 	-- balance knob with no design guidance behind it.
-	state.poise:applyHit(mitigated, os.clock())
+	local justStaggered = state.poise:applyHit(mitigated, os.clock())
 
 	CombatService.EnemyDamaged:Fire(target, mitigated, player)
 
@@ -212,10 +218,24 @@ function CombatService:ApplyDamageToEnemy(target: Model, amount: number, player:
 
 	if humanoid.Health <= 0 then
 		CombatService.EnemyDefeated:Fire(target, player)
+	elseif justStaggered then
+		-- Still alive but crossed the threshold: eligible for
+		-- RequestFinishingMove for a regular enemy, or a phase-transition
+		-- trigger for a Boss/Elite — EnemyController (T-060/T-065) decides
+		-- which by listening here.
+		CombatService.EnemyStaggered:Fire(target, player)
 	end
-	-- If this hit crossed the Stagger threshold and the target is still
-	-- alive, it's now eligible for RequestFinishingMove — nothing further to
-	-- do here; PoiseStateMachine already holds the Staggered state.
+end
+
+-- Server-internal: clears a target's Staggered state without a Finishing
+-- Move having landed — used by EnemyController for the non-boss auto-recovery
+-- timer (§3.9) and for a Boss/Elite's phase transition consuming the stagger
+-- (§4.5) instead of leaving it finisher-eligible.
+function CombatService:ClearStagger(target: Model)
+	local state = enemyStates[target]
+	if state then
+		state.poise:clearStagger(os.clock())
+	end
 end
 
 -- Server-internal: lets other services (GrappleService, WeaponPickupService,
@@ -321,6 +341,13 @@ function CombatService.Client:RequestFinishingMove(player: Player, target: Model
 		return false
 	end
 	if (targetRoot.Position - rootPart.Position).Magnitude > FINISHING_MOVE_MAX_DISTANCE then
+		return false
+	end
+	local role = target:GetAttribute("Role")
+	if role == "Boss" or role == "Elite" then
+		-- §4.5/§4.2: bosses and Elite Champions are never one-shot-finished
+		-- off a Poise stagger — being staggered gates their phase transition
+		-- (T-065) instead, handled by EnemyController.
 		return false
 	end
 
