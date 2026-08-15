@@ -20,17 +20,18 @@ local EXPECTED_KEYS = {
 	"Party",
 	"Translations",
 	"AntiCheat",
+	"Performance",
 }
 
 return function()
 	describe("ConfigService", function()
-		it("should expose all 17 config modules as non-nil tables (§14.6)", function()
+		it("should expose all 18 config modules as non-nil tables (§14.6)", function()
 			for _, key in EXPECTED_KEYS do
 				expect(ConfigService[key]).to.be.a("table")
 			end
 		end)
 
-		it("should expose exactly 17 keys, no more, no less", function()
+		it("should expose exactly 18 keys, no more, no less", function()
 			local count = 0
 			for _ in ConfigService do
 				count += 1

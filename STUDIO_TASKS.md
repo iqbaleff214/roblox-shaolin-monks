@@ -46,6 +46,8 @@ Derived from `GDD.md` (v0.1, 2026-08-14). This file covers everything that must 
 | `LootRoom` | Hidden side-room trigger volume | `ArenaId` | S-020–S-027, T-102 |
 | `BossArena` | Boss/mini-boss fight zone | `ChapterId`, `BossId` | T-065 |
 | `Checkpoint` | Mid-chapter respawn/save point | `ChapterId`, `Order` (int) | T-161 |
+| `LODProp` | Battlefield decoration prop with two authored detail levels | `LODDistance` (number, optional, default `PerformanceConfig.LOD.DefaultSwapDistance`) — requires two children named exactly `Near` (full detail) and `Far` (simplified) | S-020–S-027, T-180 |
+| `QualityScaledParticle` | ParticleEmitter/Trail whose emission rate should scale down on Medium/Low graphics quality | — (the emitter's own `Rate` at registration time is treated as its High-tier baseline) | S-020–S-027, S-065, T-181 |
 
 **Verification / Acceptance Check:** A short in-Studio test place with one instance per tag validates that each scripted system (once available) correctly picks it up. Re-run this check any time a tag/attribute is added or renamed.
 - [ ] Done

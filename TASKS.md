@@ -677,21 +677,21 @@ Each config module is pure data (no side effects), matching the example shapes i
 **Description:** Distance-based level-of-detail swapping for battlefield decoration/props (§17.4).
 **DoD / Expected Output:** Frame time impact of LOD swapping itself is negligible (no visible pop-in stutter) at the target FPS per platform.
 **Test Case:** Manual profiling pass per platform tier (ties into S-110/S-111/S-112) confirming FPS targets from §17.4's table are met with LOD active.
-- [ ] Done
+- [x] Done
 
 #### T-181 — Particle limit tiers
 **Depends on:** T-020
 **Description:** Wires hit-particle/trail-particle counts to the quality-tier settings in `UIConfig` (§17.4 — reduced count on Mobile).
 **DoD / Expected Output:** Switching graphics quality in Settings (T-134) immediately changes active particle emission rates without a rejoin.
 **Test Case:** Integration test: switch quality tier mid-session, assert particle emitter rate properties update accordingly.
-- [ ] Done
+- [x] Done
 
 #### T-182 — Streaming configuration
 **Depends on:** S-020–S-027
 **Description:** `Workspace.StreamingEnabled` + tuned `StreamingMinRadius`/`StreamingTargetRadius` so chapters load via Roblox streaming rather than full upfront load (§17.4).
 **DoD / Expected Output:** No gameplay-critical script assumes a part exists before `PartRequestedByClient`/streamed-in confirmation (guards against streaming-related nil-reference bugs).
 **Test Case:** Integration test: with streaming enabled, teleport a player directly into a late-chapter arena (skipping normal traversal) and assert no script errors occur waiting on unstreamed parts.
-- [ ] Done
+- [x] Done
 
 ---
 

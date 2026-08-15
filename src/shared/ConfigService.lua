@@ -22,6 +22,7 @@ local Config = {
 	Party = require(script.Parent.config.PartyConfig),
 	Translations = require(script.Parent.config.TranslationStrings),
 	AntiCheat = require(script.Parent.config.AntiCheatConfig),
+	Performance = require(script.Parent.config.PerformanceConfig),
 }
 
 return Config
