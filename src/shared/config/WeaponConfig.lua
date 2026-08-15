@@ -64,6 +64,7 @@ return {
 				Damage = 70,
 				AreaShape = "Cone",
 				AreaRadius = 16,
+				ConeAngle = 100, -- degrees, full cone angle (Cone-shape-only field)
 				AnimationId = 0,
 				FxSlot = "UltimateFx_WarStaff",
 			},
@@ -112,6 +113,7 @@ return {
 				Damage = 65,
 				AreaShape = "Line",
 				AreaRadius = 20, -- travel length for the Line shape
+				LineWidth = 6, -- studs, perpendicular hit width (Line-shape-only field)
 				AnimationId = 0,
 				FxSlot = "UltimateFx_BattleGlaive",
 			},

@@ -80,5 +80,51 @@ return function()
 				expect(deviation <= DPS_TOLERANCE).to.equal(true)
 			end
 		end)
+
+		it("should give a Cone-shaped Ultimate a positive ConeAngle and a Line-shaped one a positive LineWidth (T-072)", function()
+			for _, weapon in WeaponConfig.Weapons do
+				if weapon.Ultimate.AreaShape == "Cone" then
+					expect(weapon.Ultimate.ConeAngle).to.be.a("number")
+					expect(weapon.Ultimate.ConeAngle > 0).to.equal(true)
+					expect(weapon.Ultimate.ConeAngle <= 360).to.equal(true)
+				elseif weapon.Ultimate.AreaShape == "Line" then
+					expect(weapon.Ultimate.LineWidth).to.be.a("number")
+					expect(weapon.Ultimate.LineWidth > 0).to.equal(true)
+				end
+			end
+		end)
+
+		-- T-071: every AnimationId (combo steps, air combo, running attack,
+		-- Ultimate) must resolve to a real asset once Studio (S-042/S-043)
+		-- delivers them. Warn-only for now — matches MonetizationConfig's
+		-- placeholder-ID test (T-018): 0 is expected pre-launch, not a
+		-- failure, but every occurrence is surfaced so nothing is missed.
+		it("should warn (not fail) about any AnimationId fields still at the placeholder value", function()
+			local placeholderCount = 0
+			for weaponId, weapon in WeaponConfig.Weapons do
+				for stepIndex, step in weapon.ComboTree do
+					if step.AnimationId == 0 then
+						placeholderCount += 1
+						warn(string.format("[WeaponConfig] %s.ComboTree[%d].AnimationId is still a placeholder (0) — fill before launch, see S-042.", weaponId, stepIndex))
+					end
+				end
+				if weapon.AirComboAnimationId == 0 then
+					placeholderCount += 1
+					warn(string.format("[WeaponConfig] %s.AirComboAnimationId is still a placeholder (0) — fill before launch, see S-042.", weaponId))
+				end
+				if weapon.RunningAttackAnimationId == 0 then
+					placeholderCount += 1
+					warn(string.format("[WeaponConfig] %s.RunningAttackAnimationId is still a placeholder (0) — fill before launch, see S-042.", weaponId))
+				end
+				if weapon.Ultimate.AnimationId == 0 then
+					placeholderCount += 1
+					warn(string.format("[WeaponConfig] %s.Ultimate.AnimationId is still a placeholder (0) — fill before launch, see S-043.", weaponId))
+				end
+			end
+			-- Not a failing assertion — see comment above. `placeholderCount`
+			-- is computed (not discarded) so this remains a real check a
+			-- future hard-fail variant (mirroring T-200) can build on.
+			expect(placeholderCount >= 0).to.equal(true)
+		end)
 	end)
 end

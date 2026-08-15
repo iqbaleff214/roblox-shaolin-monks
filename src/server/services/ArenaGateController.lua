@@ -244,6 +244,21 @@ local function registerSpawnPoint(instance: Instance)
 	arena.maxWaveIndex = math.max(arena.maxWaveIndex, waveIndex)
 end
 
+-- Server-internal: true once `player` has touched at least one arena gate in
+-- this server instance, and stays true afterward (an arena's `playersInside`
+-- set is never cleared, including after it unseals) — used by WeaponService
+-- (T-070) as the "duration of a battlefield run" signal for the loadout
+-- lock, since the Party/Teleport system (T-120/T-121, Phase 10) that would
+-- normally define battlefield-instance context doesn't exist yet.
+function ArenaGateController:HasPlayerEnteredAnyArena(player: Player): boolean
+	for _, arena in arenas do
+		if arena.playersInside[player] then
+			return true
+		end
+	end
+	return false
+end
+
 function ArenaGateController:KnitInit()
 	for _, instance in CollectionService:GetTagged(ARENA_SPAWN_POINT_TAG) do
 		registerSpawnPoint(instance)

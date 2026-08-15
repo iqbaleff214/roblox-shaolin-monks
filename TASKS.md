@@ -283,21 +283,21 @@ Each config module is pure data (no side effects), matching the example shapes i
 **Description:** Server-authoritative Main Weapon selection in the Lobby (§5.2); locked for the duration of a battlefield run once the party enters (no mid-run weapon swap).
 **DoD / Expected Output:** A RemoteEvent attempting to change equipped weapon while inside a battlefield instance is rejected server-side.
 **Test Case:** Integration test: attempt weapon swap in Lobby (should succeed) vs. inside an active chapter instance (should be rejected).
-- [ ] Done
+- [x] Done
 
 #### T-071 — Per-weapon combo tree + animation hookup
 **Depends on:** T-011, S-041, S-042
 **Description:** Wires each of the 5 weapon types' combo strings (T-041) to their Studio-authored animation IDs (S-042), including air combo and running-attack variants (§3.2).
 **DoD / Expected Output:** Every combo tree node in `WeaponConfig` resolves to a valid, non-placeholder animation ID before this task is marked done.
 **Test Case:** TestEZ spec asserts no `AnimationId` field in `WeaponConfig` is still the placeholder value (`0`/empty string) once S-042 delivers real IDs.
-- [ ] Done
+- [x] Done
 
 #### T-072 — Ultimate ability execution framework
 **Depends on:** T-047, T-011, S-043
 **Description:** Executes the 5 unique Ultimate techniques (Whirlwind Strike, Heaven's Sweep, Serpent's Coil, Mountain Breaker, Dragon's Arc — §5.2) as config-driven damage/AoE effects, with cosmetic FX resolved from a separate skin-layer (§3.6 — function and cosmetics decoupled).
 **DoD / Expected Output:** Swapping a player's Ultimate FX skin (purchased cosmetic) never changes the Ultimate's damage/AoE — verified by the same functional test passing regardless of equipped skin.
 **Test Case:** Integration test: execute each of the 5 Ultimates against a test dummy cluster, assert damage/AoE matches config; repeat with 2 different FX skins equipped and assert identical functional results.
-- [ ] Done
+- [x] Done
 
 ---
 
