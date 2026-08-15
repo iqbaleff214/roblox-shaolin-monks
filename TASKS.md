@@ -308,21 +308,21 @@ Each config module is pure data (no side effects), matching the example shapes i
 **Description:** Equip/unequip logic for Head/Body/Arm/Leg slots; purely cosmetic — no stat hook exists anywhere in this system (enforced by T-015's schema already excluding stat fields).
 **DoD / Expected Output:** Equipping any combination of accessories produces zero measurable change to `CombatService` outputs (damage, HP, speed).
 **Test Case:** Integration test: run a fixed combat scenario with no accessories vs. full Legendary-tier accessories equipped, assert identical damage/HP/timing results.
-- [ ] Done
+- [x] Done
 
 #### T-081 — Inventory system
 **Depends on:** T-160
 **Description:** Tracks owned accessories, weapon skins, Ultimate FX skins, emotes, Spirit Companions; backed by `PlayerDataService` (T-160).
 **DoD / Expected Output:** Inventory grants (from shop purchase, crate, quest reward, chapter completion) are idempotent — granting the same item twice never duplicates an entry, only adjusts a quantity/duplicate-conversion path (T-103).
 **Test Case:** Integration test: grant the same cosmetic item twice, assert inventory count logic routes the second grant through duplicate-protection (T-103) rather than creating two entries.
-- [ ] Done
+- [x] Done
 
 #### T-082 — Cosmetic rarity visual tier system
 **Depends on:** T-015, S-054–S-057
 **Description:** Applies tier-appropriate particle/glow effects (Common → Legendary, §5.3) to equipped cosmetics at render time.
 **DoD / Expected Output:** Visual tier is derived purely from the item's `Rarity` field — no separate "is legendary" flags to keep in sync.
 **Test Case:** Integration test: equip one item per rarity tier, assert the correct VFX preset is applied for each.
-- [ ] Done
+- [x] Done
 
 ---
 

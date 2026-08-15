@@ -49,4 +49,15 @@ return {
 		Medium = 100,
 		Low = 40,
 	},
+
+	-- §5.3/T-082: glow/particle intensity per cosmetic rarity tier. Colors
+	-- live in Colors.RarityXxx above (referenced by name, not duplicated
+	-- here) — this table only adds the numeric VFX-intensity axis.
+	RarityTiers = {
+		Common = { GlowIntensity = 0, ParticleDensity = 0 },
+		Uncommon = { GlowIntensity = 0.15, ParticleDensity = 1 },
+		Rare = { GlowIntensity = 0.35, ParticleDensity = 2 },
+		Epic = { GlowIntensity = 0.6, ParticleDensity = 3 },
+		Legendary = { GlowIntensity = 1, ParticleDensity = 5 },
+	},
 }

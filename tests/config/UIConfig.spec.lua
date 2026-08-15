@@ -27,5 +27,29 @@ return function()
 				expect(anchor.Y >= 0 and anchor.Y <= 1).to.equal(true)
 			end
 		end)
+
+		it("should define all 5 rarity tiers with a matching Colors.RarityXxx entry (§5.3)", function()
+			local expectedRarities = { "Common", "Uncommon", "Rare", "Epic", "Legendary" }
+			for _, rarity in expectedRarities do
+				expect(UIConfig.RarityTiers[rarity]).to.be.a("table")
+				expect(UIConfig.Colors["Rarity" .. rarity]).never.to.equal(nil)
+			end
+			local count = 0
+			for _ in UIConfig.RarityTiers do
+				count += 1
+			end
+			expect(count).to.equal(#expectedRarities)
+		end)
+
+		it("should scale rarity GlowIntensity and ParticleDensity monotonically from Common to Legendary", function()
+			local orderedRarities = { "Common", "Uncommon", "Rare", "Epic", "Legendary" }
+			local previousGlow, previousDensity = -1, -1
+			for _, rarity in orderedRarities do
+				local tier = UIConfig.RarityTiers[rarity]
+				expect(tier.GlowIntensity >= previousGlow).to.equal(true)
+				expect(tier.ParticleDensity >= previousDensity).to.equal(true)
+				previousGlow, previousDensity = tier.GlowIntensity, tier.ParticleDensity
+			end
+		end)
 	end)
 end
