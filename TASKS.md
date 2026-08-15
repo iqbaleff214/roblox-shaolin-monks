@@ -702,35 +702,35 @@ Each config module is pure data (no side effects), matching the example shapes i
 **Description:** Consolidates all Phase 1 TestEZ specs into a single suite run before every deploy.
 **DoD / Expected Output:** Suite runs in under a defined time budget (e.g. <30s) so it's practical to run pre-commit/pre-publish.
 **Test Case:** Suite itself is the test artifact; DoD is "all Phase 1 specs pass simultaneously."
-- [ ] Done
+- [x] Done
 
 #### T-191 — Integration test: full arena clear simulation
 **Depends on:** T-049, T-061, T-062, T-102
 **Description:** Headless (or Studio command-bar-driven) simulation of a full arena: enter, gate seals, waves spawn/clear, gate unseals, chest spawns.
 **DoD / Expected Output:** Simulation completes end-to-end without manual intervention and asserts each state transition occurred in the correct order.
 **Test Case:** Automated run against at least one arena per difficulty tier (§8.3).
-- [ ] Done
+- [x] Done
 
 #### T-192 — Integration test: purchase flow simulation
 **Depends on:** T-113, T-114
 **Description:** Mocked `ProcessReceipt`/GamePass-ownership flow validating idempotent grants (ties to T-114's DoD).
 **DoD / Expected Output:** Covers both GamePass and Developer Product paths, including the double-call idempotency case.
 **Test Case:** As specified in T-114; consolidated here as part of the regression suite.
-- [ ] Done
+- [x] Done
 
 #### T-193 — 4-player combat load test
 **Depends on:** T-042, T-050, T-061
 **Description:** Automated or scripted-bot 4-client load test of a single arena at full party size, per the §17.6 pre-launch checklist item and §17.1's netcode risk flag.
 **DoD / Expected Output:** No desync, no rubber-banding, no server error spikes under sustained 4-player combat load for the duration of a full arena clear.
 **Test Case:** Documented load-test run with captured server/client logs showing zero reconciliation-rejection spikes beyond expected baseline.
-- [ ] Done
+- [x] Done
 
 #### T-194 — Weapon DPS balance logging tool
 **Depends on:** T-011, T-062
 **Description:** Logs realized damage-per-second per weapon type across standard wave compositions (not just the theoretical DPS check in T-011), producing a tuning report per §17.6.
 **DoD / Expected Output:** Report output is diffable across builds so a future balance change's impact is visible before merge.
 **Test Case:** Run against all 5 weapons on a fixed test wave, output report reviewed against the ±5% tolerance band from T-011.
-- [ ] Done
+- [x] Done
 
 ---
 
